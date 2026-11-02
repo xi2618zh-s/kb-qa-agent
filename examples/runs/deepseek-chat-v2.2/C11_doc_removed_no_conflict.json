@@ -1,0 +1,311 @@
+{
+  "case_id": "C11_doc_removed_no_conflict",
+  "acceptance": [
+    "明确答案",
+    "替换文档"
+  ],
+  "description": "移除 D02 后只剩 D01，没有冲突，应依据 D01 回答 30 天（题目参考实例的第二种情况）。",
+  "provider": "openai",
+  "model": "deepseek-chat",
+  "options": {
+    "exclude_docs": [
+      "D02"
+    ]
+  },
+  "generated_at": "2026-11-02T18:54:38+08:00",
+  "passed": true,
+  "turns": [
+    {
+      "question": "报销期限是多久？",
+      "history_in": [],
+      "expect": {
+        "status": [
+          "answered"
+        ],
+        "cited_docs_include": [
+          "D01"
+        ],
+        "cited_docs_exclude": [
+          "D02"
+        ],
+        "answer_contains_any": [
+          "30"
+        ]
+      },
+      "expect_source": "expect",
+      "checks": [
+        {
+          "name": "status",
+          "passed": true,
+          "detail": "实际 answered，期望 ['answered']"
+        },
+        {
+          "name": "引用包含",
+          "passed": true,
+          "detail": "实际引用 ['D01']"
+        },
+        {
+          "name": "引用不含",
+          "passed": true,
+          "detail": "实际引用 ['D01']"
+        },
+        {
+          "name": "回答包含其一",
+          "passed": true,
+          "detail": "期望含 ['30'] 之一，找到 ['30']"
+        }
+      ],
+      "passed": true,
+      "result": {
+        "status": "answered",
+        "answer": "报销期限为：员工应在费用发生之日起 30 天内通过 OA 系统提交报销申请；超过期限的，须附部门负责人签字的情况说明。依据《费用报销管理办法》（D01，2023-03-01，财务部）\"报销期限\"条款。补充：该办法适用于公司全体正式员工因公发生的日常费用报销，包括市内交通费、业务招待费和办公用品费。",
+        "citations": [
+          {
+            "doc_id": "D01",
+            "title": "费用报销管理办法",
+            "version_date": "2023-03-01",
+            "quote": "员工应在费用发生之日起 30 天内通过 OA 系统提交报销申请。超过期限的，须附部门负责人签字的情况说明。"
+          },
+          {
+            "doc_id": "D01",
+            "title": "费用报销管理办法",
+            "version_date": "2023-03-01",
+            "quote": "本办法适用于公司全体正式员工因公发生的日常费用报销，包括市内交通费、业务招待费和办公用品费。"
+          }
+        ],
+        "gaps": [],
+        "clarification_question": "",
+        "stop_reason": "finished",
+        "steps_used": 4,
+        "tool_calls_used": 5,
+        "limits": {
+          "max_steps": 8,
+          "max_tool_calls": 12
+        },
+        "trace": [
+          {
+            "step": 1,
+            "action": "search_docs",
+            "arguments": {
+              "query": "报销期限"
+            },
+            "reason": "直接检索报销期限相关制度",
+            "llm_ms": 1423,
+            "usage": {
+              "prompt_tokens": 1612,
+              "completion_tokens": 130
+            },
+            "ok": true,
+            "observation": "检索“报销期限”：4 条 — D01-S2(8.653), D01-S3(2.593), D01-S4(2.161), D01-S1(2.13)",
+            "next_action": "search_docs"
+          },
+          {
+            "step": 1,
+            "action": "search_docs",
+            "arguments": {
+              "query": "费用报销 提交时间 规定"
+            },
+            "reason": "换用制度原文可能出现的说法检索报销时限",
+            "llm_ms": 1423,
+            "usage": {
+              "prompt_tokens": 1612,
+              "completion_tokens": 130
+            },
+            "ok": true,
+            "observation": "检索“费用报销 提交时间 规定”：5 条 — D01-S2(7.434), D01-S1(6.39), D01-S3(6.335), D01-S4(5.132), D07-S1(3.667)",
+            "next_action": "read_doc"
+          },
+          {
+            "step": 2,
+            "action": "read_doc",
+            "arguments": {
+              "doc_id": "D01"
+            },
+            "reason": "读取费用报销管理办法原文，确认报销期限及适用范围",
+            "llm_ms": 1510,
+            "usage": {
+              "prompt_tokens": 2824,
+              "completion_tokens": 156
+            },
+            "ok": true,
+            "observation": "读取 D01《费用报销管理办法》(2023-03-01)：D01-S1, D01-S2, D01-S3, D01-S4",
+            "next_action": "search_docs"
+          },
+          {
+            "step": 2,
+            "action": "search_docs",
+            "arguments": {
+              "query": "差旅费 报销 天数 时限"
+            },
+            "reason": "检查是否存在其他报销类制度对期限另有规定",
+            "llm_ms": 1510,
+            "usage": {
+              "prompt_tokens": 2824,
+              "completion_tokens": 156
+            },
+            "ok": true,
+            "observation": "检索“差旅费 报销 天数 时限”：5 条 — D04-S4(4.07), D01-S3(2.593), D01-S2(2.533), D01-S4(2.161), D01-S1(2.13)",
+            "next_action": "read_doc"
+          },
+          {
+            "step": 3,
+            "action": "read_doc",
+            "arguments": {
+              "doc_id": "D04"
+            },
+            "reason": "确认差旅管理办法是否对报销期限另有规定",
+            "llm_ms": 1430,
+            "usage": {
+              "prompt_tokens": 3815,
+              "completion_tokens": 87
+            },
+            "ok": true,
+            "observation": "读取 D04《差旅管理办法》(2023-09-01)：D04-S1, D04-S2, D04-S3, D04-S4",
+            "next_action": "finish"
+          },
+          {
+            "step": 4,
+            "action": "finish",
+            "arguments": {
+              "status": "answered",
+              "answer": "报销期限为：员工应在费用发生之日起 30 天内通过 OA 系统提交报销申请；超过期限的，须附部门负责人签字的情况说明。依据《费用报销管理办法》（D01，2023-03-01，财务部）\"报销期限\"条款。补充：该办法适用于公司全体正式员工因公发生的日常费用报销，包括市内交通费、业务招待费和办公用品费。",
+              "citations": [
+                {
+                  "doc_id": "D01",
+                  "quote": "员工应在费用发生之日起 30 天内通过 OA 系统提交报销申请。超过期限的，须附部门负责人签字的情况说明。"
+                },
+                {
+                  "doc_id": "D01",
+                  "quote": "本办法适用于公司全体正式员工因公发生的日常费用报销，包括市内交通费、业务招待费和办公用品费。"
+                }
+              ],
+              "gaps": []
+            },
+            "reason": "D01 明确规定了报销期限，D04 差旅管理办法未涉及报销期限，无冲突，可直接作答。",
+            "llm_ms": 2122,
+            "usage": {
+              "prompt_tokens": 4146,
+              "completion_tokens": 307
+            },
+            "ok": true,
+            "observation": "结果通过校验，本轮结束",
+            "next_action": "（结束）"
+          }
+        ],
+        "transcript": [
+          {
+            "role": "system",
+            "content": "你是企业内部知识库问答助手，帮助员工查询公司制度和产品 FAQ。你只能依据工具返回的知识库原文回答，不能使用常识或外部知识补全。\n\n工作方式：每一步调用一个工具，观察结果后决定下一步。可用工具：\n- search_docs：检索知识库。结果为空或与问题无关时，可以换成制度原文里可能出现的说法再检索。\n- read_doc：读取文档原文。引用前必须先读取原文；检索片段只用于定位。\n- finish：提交结构化结果并结束本轮。不要直接用文字回答，必须通过 finish 提交。\n\n决策规则：\n1. 检索后读取相关文档原文，再作答。可能相关的文档都要读，以便发现规定不一致。\n2. 多份文档对同一事项规定不一致时，先在原文中查找适用范围、生效或替代关系等条款：\n   - 原文写明了适用范围或优先级：按原文分别说明，并引用这些条款，status=answered。\n   - 原文没有写明：status=conflict_needs_confirmation。在 answer 中列出每份文档的规定和版本日期，引用各自原文。不得因为版本日期较新或其他推测自行选定一个答案。\n   - 冲突时的 clarification_question 要给出可选项，逐一列出各文档的 ID 和标题，请用户选择适用哪份。只陈述原文中的规定，不得加入原文没有的推测（例如原文没提到的部门、费用类型或流程区分）。\n   - 同一事项按条件分档（如按工龄、城市分级）不是冲突，应按档位说明。\n3. 检索结果与问题无关时，最多换 2 次关键词；仍然完全找不到依据就 status=insufficient_evidence，在 gaps 中说明缺少什么资料，此时不附引用。\n   知识库只能回答问题的一部分时，用 status=answered：回答能回答的部分并引用，把缺失的部分写进 gaps。\n4. 工具返回 TOOL_UNAVAILABLE 时可以重试；同一工具连续 2 次不可用就不要再试，直接 status=tool_error，说明哪些资料未能获取，不得编造。\n5. 问题缺少必要条件、无法确定要查什么时（例如“这个”“那笔”没有可指代的对象），status=need_clarification，并在 clarification_question 中追问。\n6. 结合对话历史理解追问（如“那……呢”）。用户在历史中已确认适用哪份制度的，按用户确认的制度回答，并在 answer 中说明依据的是用户确认。\n7. citations 的 quote 必须逐字摘自 read_doc 返回的原文，可以截取片段，但不能改写、拼接或加省略号。answer 中出现的数字必须能在引用原文或用户问题中找到。\n   citations 只放回答中实际用到的原文（结论和补充都算），不要引用回答没用到的段落。不值得引用的补充就不要写。\n8. answer 的格式：第一句直接给出结论；随后说明依据（文档和版本日期）；与问题没有直接关系的补充最多一条。\n9. 每次调用工具都在 reason 参数中用一句话说明为什么选择这一步。\n10. 本轮最多 8 步，每次工具结果会告诉你剩余步数。快用完时，用已有信息调用 finish。"
+          },
+          {
+            "role": "user",
+            "content": "当前问题：报销期限是多久？"
+          },
+          {
+            "role": "assistant",
+            "content": "我会先检索知识库中关于报销期限的规定。",
+            "tool_calls": [
+              {
+                "id": "call_00_aUAvLOIM5tZT9Xsc73li7342",
+                "type": "function",
+                "function": {
+                  "name": "search_docs",
+                  "arguments": "{\"query\": \"报销期限\", \"reason\": \"直接检索报销期限相关制度\"}"
+                }
+              },
+              {
+                "id": "call_01_LmzefxKX0mpftH6YUvNO9962",
+                "type": "function",
+                "function": {
+                  "name": "search_docs",
+                  "arguments": "{\"query\": \"费用报销 提交时间 规定\", \"reason\": \"换用制度原文可能出现的说法检索报销时限\"}"
+                }
+              }
+            ]
+          },
+          {
+            "role": "tool",
+            "tool_call_id": "call_00_aUAvLOIM5tZT9Xsc73li7342",
+            "content": "{\"ok\": true, \"query\": \"报销期限\", \"result_count\": 4, \"results\": [{\"doc_id\": \"D01\", \"title\": \"费用报销管理办法\", \"version_date\": \"2023-03-01\", \"section_id\": \"D01-S2\", \"section_title\": \"报销期限\", \"snippet\": \"员工应在费用发生之日起 30 天内通过 OA 系统提交报销申请。超过期限的，须附部门负责人签字的情况说明。\", \"score\": 8.653, \"coverage\": 1.0, \"matched_terms\": [\"报销\", \"销期\", \"期限\"]}, {\"doc_id\": \"D01\", \"title\": \"费用报销管理办法\", \"version_date\": \"2023-03-01\", \"section_id\": \"D01-S3\", \"section_title\": \"报销材料\", \"snippet\": \"报销须提供合规的纸质发票或电子发票，以及费用明细单。单笔金额超过 5000 元的，须附事前审批单。\", \"score\": 2.593, \"coverage\": 0.228, \"matched_terms\": [\"报销\"]}, {\"doc_id\": \"D01\", \"title\": \"费用报销管理办法\", \"version_date\": \"2023-03-01\", \"section_id\": \"D01-S4\", \"section_title\": \"审批与付款\", \"snippet\": \"报销申请依次由直属上级、部门负责人和财务部审核。财务部在审核通过后 7 个工作日内完成付款。\", \"score\": 2.161, \"coverage\": 0.228, \"matched_terms\": [\"报销\"]}, {\"doc_id\": \"D01\", \"title\": \"费用报销管理办法\", \"version_date\": \"2023-03-01\", \"section_id\": \"D01-S1\", \"section_title\": \"适用范围\", \"snippet\": \"本办法适用于公司全体正式员工因公发生的日常费用报销，包括市内交通费、业务招待费和办公用品费。\", \"score\": 2.13, \"coverage\": 0.228, \"matched_terms\": [\"报销\"]}], \"steps_left\": 7}"
+          },
+          {
+            "role": "tool",
+            "tool_call_id": "call_01_LmzefxKX0mpftH6YUvNO9962",
+            "content": "{\"ok\": true, \"query\": \"费用报销 提交时间 规定\", \"result_count\": 5, \"results\": [{\"doc_id\": \"D01\", \"title\": \"费用报销管理办法\", \"version_date\": \"2023-03-01\", \"section_id\": \"D01-S2\", \"section_title\": \"报销期限\", \"snippet\": \"员工应在费用发生之日起 30 天内通过 OA 系统提交报销申请。超过期限的，须附部门负责人签字的情况说明。\", \"score\": 7.434, \"coverage\": 0.387, \"matched_terms\": [\"费用\", \"用报\", \"报销\", \"提交\"]}, {\"doc_id\": \"D01\", \"title\": \"费用报销管理办法\", \"version_date\": \"2023-03-01\", \"section_id\": \"D01-S1\", \"section_title\": \"适用范围\", \"snippet\": \"本办法适用于公司全体正式员工因公发生的日常费用报销，包括市内交通费、业务招待费和办公用品费。\", \"score\": 6.39, \"coverage\": 0.3, \"matched_terms\": [\"费用\", \"用报\", \"报销\"]}, {\"doc_id\": \"D01\", \"title\": \"费用报销管理办法\", \"version_date\": \"2023-03-01\", \"section_id\": \"D01-S3\", \"section_title\": \"报销材料\", \"snippet\": \"报销须提供合规的纸质发票或电子发票，以及费用明细单。单笔金额超过 5000 元的，须附事前审批单。\", \"score\": 6.335, \"coverage\": 0.3, \"matched_terms\": [\"费用\", \"用报\", \"报销\"]}, {\"doc_id\": \"D01\", \"title\": \"费用报销管理办法\", \"version_date\": \"2023-03-01\", \"section_id\": \"D01-S4\", \"section_title\": \"审批与付款\", \"snippet\": \"报销申请依次由直属上级、部门负责人和财务部审核。财务部在审核通过后 7 个工作日内完成付款。\", \"score\": 5.132, \"coverage\": 0.3, \"matched_terms\": [\"费用\", \"用报\", \"报销\"]}, {\"doc_id\": \"D07\", \"title\": \"加班与调休规定\", \"version_date\": \"2023-11-15\", \"section_id\": \"D07-S1\", \"section_title\": \"加班申请\", \"snippet\": \"加班须事先在 OA 系统提交加班申请，经直属上级批准。未经批准的加班不计入调休。\", \"score\": 3.667, \"coverage\": 0.224, \"matched_terms\": [\"提交\", \"规定\"]}], \"steps_left\": 7}"
+          },
+          {
+            "role": "assistant",
+            "content": "检索到 D01《费用报销管理办法》的报销期限条款，我会读取原文确认，并检查是否有其他文档也规定报销期限。",
+            "tool_calls": [
+              {
+                "id": "call_00_ud598Hk6gpQ28lg9ONyw2021",
+                "type": "function",
+                "function": {
+                  "name": "read_doc",
+                  "arguments": "{\"doc_id\": \"D01\", \"reason\": \"读取费用报销管理办法原文，确认报销期限及适用范围\"}"
+                }
+              },
+              {
+                "id": "call_01_MyT5caJDfdaSdjy7DUO76411",
+                "type": "function",
+                "function": {
+                  "name": "search_docs",
+                  "arguments": "{\"query\": \"差旅费 报销 天数 时限\", \"reason\": \"检查是否存在其他报销类制度对期限另有规定\"}"
+                }
+              }
+            ]
+          },
+          {
+            "role": "tool",
+            "tool_call_id": "call_00_ud598Hk6gpQ28lg9ONyw2021",
+            "content": "{\"ok\": true, \"doc_id\": \"D01\", \"title\": \"费用报销管理办法\", \"version_date\": \"2023-03-01\", \"owner\": \"财务部\", \"sections\": [{\"section_id\": \"D01-S1\", \"title\": \"适用范围\", \"text\": \"本办法适用于公司全体正式员工因公发生的日常费用报销，包括市内交通费、业务招待费和办公用品费。\"}, {\"section_id\": \"D01-S2\", \"title\": \"报销期限\", \"text\": \"员工应在费用发生之日起 30 天内通过 OA 系统提交报销申请。超过期限的，须附部门负责人签字的情况说明。\"}, {\"section_id\": \"D01-S3\", \"title\": \"报销材料\", \"text\": \"报销须提供合规的纸质发票或电子发票，以及费用明细单。单笔金额超过 5000 元的，须附事前审批单。\"}, {\"section_id\": \"D01-S4\", \"title\": \"审批与付款\", \"text\": \"报销申请依次由直属上级、部门负责人和财务部审核。财务部在审核通过后 7 个工作日内完成付款。\"}], \"steps_left\": 6}"
+          },
+          {
+            "role": "tool",
+            "tool_call_id": "call_01_MyT5caJDfdaSdjy7DUO76411",
+            "content": "{\"ok\": true, \"query\": \"差旅费 报销 天数 时限\", \"result_count\": 5, \"results\": [{\"doc_id\": \"D04\", \"title\": \"差旅管理办法\", \"version_date\": \"2023-09-01\", \"section_id\": \"D04-S4\", \"section_title\": \"出差补助\", \"snippet\": \"出差期间按实际出差天数发放伙食补助，每天 100 元。\", \"score\": 4.07, \"coverage\": 0.272, \"matched_terms\": [\"差旅\", \"天数\"]}, {\"doc_id\": \"D01\", \"title\": \"费用报销管理办法\", \"version_date\": \"2023-03-01\", \"section_id\": \"D01-S3\", \"section_title\": \"报销材料\", \"snippet\": \"报销须提供合规的纸质发票或电子发票，以及费用明细单。单笔金额超过 5000 元的，须附事前审批单。\", \"score\": 2.593, \"coverage\": 0.126, \"matched_terms\": [\"报销\"]}, {\"doc_id\": \"D01\", \"title\": \"费用报销管理办法\", \"version_date\": \"2023-03-01\", \"section_id\": \"D01-S2\", \"section_title\": \"报销期限\", \"snippet\": \"员工应在费用发生之日起 30 天内通过 OA 系统提交报销申请。超过期限的，须附部门负责人签字的情况说明。\", \"score\": 2.533, \"coverage\": 0.126, \"matched_terms\": [\"报销\"]}, {\"doc_id\": \"D01\", \"title\": \"费用报销管理办法\", \"version_date\": \"2023-03-01\", \"section_id\": \"D01-S4\", \"section_title\": \"审批与付款\", \"snippet\": \"报销申请依次由直属上级、部门负责人和财务部审核。财务部在审核通过后 7 个工作日内完成付款。\", \"score\": 2.161, \"coverage\": 0.126, \"matched_terms\": [\"报销\"]}, {\"doc_id\": \"D01\", \"title\": \"费用报销管理办法\", \"version_date\": \"2023-03-01\", \"section_id\": \"D01-S1\", \"section_title\": \"适用范围\", \"snippet\": \"本办法适用于公司全体正式员工因公发生的日常费用报销，包括市内交通费、业务招待费和办公用品费。\", \"score\": 2.13, \"coverage\": 0.126, \"matched_terms\": [\"报销\"]}], \"steps_left\": 6}"
+          },
+          {
+            "role": "assistant",
+            "content": "D04《差旅管理办法》可能也涉及报销，我会读取原文，确认其中是否有不同的期限规定。",
+            "tool_calls": [
+              {
+                "id": "call_00_7SPOcpCOne5H8GpBiShv4690",
+                "type": "function",
+                "function": {
+                  "name": "read_doc",
+                  "arguments": "{\"doc_id\": \"D04\", \"reason\": \"确认差旅管理办法是否对报销期限另有规定\"}"
+                }
+              }
+            ]
+          },
+          {
+            "role": "tool",
+            "tool_call_id": "call_00_7SPOcpCOne5H8GpBiShv4690",
+            "content": "{\"ok\": true, \"doc_id\": \"D04\", \"title\": \"差旅管理办法\", \"version_date\": \"2023-09-01\", \"owner\": \"行政部\", \"sections\": [{\"section_id\": \"D04-S1\", \"title\": \"出差申请\", \"text\": \"出差前须在 OA 系统提交出差申请，经部门负责人批准后方可预订交通和住宿。\"}, {\"section_id\": \"D04-S2\", \"title\": \"住宿标准\", \"text\": \"一线城市（北京、上海、广州、深圳）住宿标准为每晚 500 元以内，其他城市为每晚 350 元以内。\"}, {\"section_id\": \"D04-S3\", \"title\": \"交通标准\", \"text\": \"城际交通优先选择高铁二等座；单程超过 6 小时的，可申请经济舱机票。\"}, {\"section_id\": \"D04-S4\", \"title\": \"出差补助\", \"text\": \"出差期间按实际出差天数发放伙食补助，每天 100 元。\"}], \"steps_left\": 5}"
+          },
+          {
+            "role": "assistant",
+            "content": "D04 未涉及报销期限，只有 D01 有明确规定，可以作答。",
+            "tool_calls": [
+              {
+                "id": "call_00_VaYpEVXN5aGs8Gohzcb59230",
+                "type": "function",
+                "function": {
+                  "name": "finish",
+                  "arguments": "{\"status\": \"answered\", \"answer\": \"报销期限为：员工应在费用发生之日起 30 天内通过 OA 系统提交报销申请；超过期限的，须附部门负责人签字的情况说明。依据《费用报销管理办法》（D01，2023-03-01，财务部）\\\"报销期限\\\"条款。补充：该办法适用于公司全体正式员工因公发生的日常费用报销，包括市内交通费、业务招待费和办公用品费。\", \"citations\": [{\"doc_id\": \"D01\", \"quote\": \"员工应在费用发生之日起 30 天内通过 OA 系统提交报销申请。超过期限的，须附部门负责人签字的情况说明。\"}, {\"doc_id\": \"D01\", \"quote\": \"本办法适用于公司全体正式员工因公发生的日常费用报销，包括市内交通费、业务招待费和办公用品费。\"}], \"gaps\": [], \"reason\": \"D01 明确规定了报销期限，D04 差旅管理办法未涉及报销期限，无冲突，可直接作答。\"}"
+                }
+              }
+            ]
+          },
+          {
+            "role": "tool",
+            "tool_call_id": "call_00_VaYpEVXN5aGs8Gohzcb59230",
+            "content": "{\"ok\": true, \"accepted\": true, \"steps_left\": 4}"
+          }
+        ],
+        "error": ""
+      }
+    }
+  ]
+}

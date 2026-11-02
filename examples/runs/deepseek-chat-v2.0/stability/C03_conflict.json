@@ -1,0 +1,824 @@
+[
+  {
+    "case_id": "C03_conflict",
+    "acceptance": [
+      "文档冲突"
+    ],
+    "description": "题目参考实例：D01 写 30 天、D02 写 15 天，均未写适用范围和优先级。应列出冲突并请求确认，不能擅自回答 15 天。",
+    "provider": "openai",
+    "model": "deepseek-chat",
+    "options": {},
+    "generated_at": "2026-11-02T18:34:33+08:00",
+    "passed": true,
+    "turns": [
+      {
+        "question": "报销期限是多久？",
+        "history_in": [],
+        "expect": {
+          "status": [
+            "conflict_needs_confirmation"
+          ],
+          "cited_docs_include": [
+            "D01",
+            "D02"
+          ],
+          "answer_contains_all": [
+            "30",
+            "15"
+          ]
+        },
+        "expect_source": "expect",
+        "checks": [
+          {
+            "name": "status",
+            "passed": true,
+            "detail": "实际 conflict_needs_confirmation，期望 ['conflict_needs_confirmation']"
+          },
+          {
+            "name": "引用包含",
+            "passed": true,
+            "detail": "实际引用 ['D01', 'D02']"
+          },
+          {
+            "name": "回答包含全部",
+            "passed": true,
+            "detail": "全部包含"
+          }
+        ],
+        "passed": true,
+        "result": {
+          "status": "conflict_needs_confirmation",
+          "answer": "知识库中两份文档对报销期限的规定不一致，且原文均未写明适用范围或替代/优先级关系，需要您确认适用哪一份：\n\n1. 《费用报销管理办法》（D01，财务部，版本日期 2023-03-01）\"报销期限\"：员工应在费用发生之日起 30 天内通过 OA 系统提交报销申请。超过期限的，须附部门负责人签字的情况说明。\n2. 《费用报销操作指引》（D02，财务共享中心，版本日期 2024-05-20）\"报销提交期限\"：费用报销须在费用发生后 15 天内提交，逾期后系统将关闭该笔费用的报销入口。\n\n两份文档的差异不仅在天数（30 天与 15 天），逾期后果也不同（D01 允许附情况说明，D02 是系统关闭报销入口）。D01 的适用范围条款只说明适用于公司全体正式员工因公发生的日常费用报销（含市内交通费、业务招待费和办公用品费），未说明与 D02 的关系；D02 未设适用范围条款。",
+          "citations": [
+            {
+              "doc_id": "D01",
+              "title": "费用报销管理办法",
+              "version_date": "2023-03-01",
+              "quote": "员工应在费用发生之日起 30 天内通过 OA 系统提交报销申请。超过期限的，须附部门负责人签字的情况说明。"
+            },
+            {
+              "doc_id": "D02",
+              "title": "费用报销操作指引",
+              "version_date": "2024-05-20",
+              "quote": "费用报销须在费用发生后 15 天内提交，逾期后系统将关闭该笔费用的报销入口。"
+            },
+            {
+              "doc_id": "D01",
+              "title": "费用报销管理办法",
+              "version_date": "2023-03-01",
+              "quote": "本办法适用于公司全体正式员工因公发生的日常费用报销，包括市内交通费、业务招待费和办公用品费。"
+            }
+          ],
+          "gaps": [
+            "两份文档均未写明相互之间的适用关系、优先级或替代关系，无法判断以哪一份为准",
+            "D02《费用报销操作指引》未设适用范围条款，无法确定其覆盖的费用类型或人员范围"
+          ],
+          "clarification_question": "请确认您要适用哪一份文档的规定：①D01《费用报销管理办法》（2023-03-01，30 天内提交，逾期须附部门负责人签字的情况说明）；②D02《费用报销操作指引》（2024-05-20，15 天内提交，逾期系统关闭报销入口）。",
+          "stop_reason": "finished",
+          "steps_used": 3,
+          "tool_calls_used": 4,
+          "limits": {
+            "max_steps": 8,
+            "max_tool_calls": 12
+          },
+          "trace": [
+            {
+              "step": 1,
+              "action": "search_docs",
+              "arguments": {
+                "query": "报销期限"
+              },
+              "reason": "直接检索报销期限相关制度",
+              "llm_ms": 1149,
+              "usage": {
+                "prompt_tokens": 1596,
+                "completion_tokens": 131
+              },
+              "ok": true,
+              "observation": "检索“报销期限”：5 条 — D01-S2(7.699), D02-S1(4.618), D01-S3(2.132), D02-S2(1.933), D01-S4(1.776)",
+              "next_action": "search_docs"
+            },
+            {
+              "step": 1,
+              "action": "search_docs",
+              "arguments": {
+                "query": "费用报销 提交时间 规定"
+              },
+              "reason": "换用制度原文可能出现的说法检索报销提交时限",
+              "llm_ms": 1149,
+              "usage": {
+                "prompt_tokens": 1596,
+                "completion_tokens": 131
+              },
+              "ok": true,
+              "observation": "检索“费用报销 提交时间 规定”：5 条 — D02-S1(8.455), D01-S2(6.261), D01-S1(5.251), D01-S3(5.207), D02-S2(4.679)",
+              "next_action": "read_doc"
+            },
+            {
+              "step": 2,
+              "action": "read_doc",
+              "arguments": {
+                "doc_id": "D01"
+              },
+              "reason": "读取《费用报销管理办法》全文，查看适用范围与生效/替代条款",
+              "llm_ms": 1406,
+              "usage": {
+                "prompt_tokens": 2918,
+                "completion_tokens": 156
+              },
+              "ok": true,
+              "observation": "读取 D01《费用报销管理办法》(2023-03-01)：D01-S1, D01-S2, D01-S3, D01-S4",
+              "next_action": "read_doc"
+            },
+            {
+              "step": 2,
+              "action": "read_doc",
+              "arguments": {
+                "doc_id": "D02"
+              },
+              "reason": "读取《费用报销操作指引》全文，查看适用范围与生效/替代条款",
+              "llm_ms": 1406,
+              "usage": {
+                "prompt_tokens": 2918,
+                "completion_tokens": 156
+              },
+              "ok": true,
+              "observation": "读取 D02《费用报销操作指引》(2024-05-20)：D02-S1, D02-S2",
+              "next_action": "finish"
+            },
+            {
+              "step": 3,
+              "action": "finish",
+              "arguments": {
+                "status": "conflict_needs_confirmation",
+                "answer": "知识库中两份文档对报销期限的规定不一致，且原文均未写明适用范围或替代/优先级关系，需要您确认适用哪一份：\n\n1. 《费用报销管理办法》（D01，财务部，版本日期 2023-03-01）\"报销期限\"：员工应在费用发生之日起 30 天内通过 OA 系统提交报销申请。超过期限的，须附部门负责人签字的情况说明。\n2. 《费用报销操作指引》（D02，财务共享中心，版本日期 2024-05-20）\"报销提交期限\"：费用报销须在费用发生后 15 天内提交，逾期后系统将关闭该笔费用的报销入口。\n\n两份文档的差异不仅在天数（30 天与 15 天），逾期后果也不同（D01 允许附情况说明，D02 是系统关闭报销入口）。D01 的适用范围条款只说明适用于公司全体正式员工因公发生的日常费用报销（含市内交通费、业务招待费和办公用品费），未说明与 D02 的关系；D02 未设适用范围条款。",
+                "citations": [
+                  {
+                    "doc_id": "D01",
+                    "quote": "员工应在费用发生之日起 30 天内通过 OA 系统提交报销申请。超过期限的，须附部门负责人签字的情况说明。"
+                  },
+                  {
+                    "doc_id": "D02",
+                    "quote": "费用报销须在费用发生后 15 天内提交，逾期后系统将关闭该笔费用的报销入口。"
+                  },
+                  {
+                    "doc_id": "D01",
+                    "quote": "本办法适用于公司全体正式员工因公发生的日常费用报销，包括市内交通费、业务招待费和办公用品费。"
+                  }
+                ],
+                "gaps": [
+                  "两份文档均未写明相互之间的适用关系、优先级或替代关系，无法判断以哪一份为准",
+                  "D02《费用报销操作指引》未设适用范围条款，无法确定其覆盖的费用类型或人员范围"
+                ],
+                "clarification_question": "请确认您要适用哪一份文档的规定：①D01《费用报销管理办法》（2023-03-01，30 天内提交，逾期须附部门负责人签字的情况说明）；②D02《费用报销操作指引》（2024-05-20，15 天内提交，逾期系统关闭报销入口）。"
+              },
+              "reason": "两份文档对报销期限规定不一致，且原文均无适用范围或优先级条款，按规则需请用户确认适用哪份。",
+              "llm_ms": 4911,
+              "usage": {
+                "prompt_tokens": 3494,
+                "completion_tokens": 623
+              },
+              "ok": true,
+              "observation": "结果通过校验，本轮结束",
+              "next_action": "（结束）"
+            }
+          ],
+          "transcript": [
+            {
+              "role": "system",
+              "content": "你是企业内部知识库问答助手，帮助员工查询公司制度和产品 FAQ。你只能依据工具返回的知识库原文回答，不能使用常识或外部知识补全。\n\n工作方式：每一步调用一个工具，观察结果后决定下一步。可用工具：\n- search_docs：检索知识库。结果为空或与问题无关时，可以换成制度原文里可能出现的说法再检索。\n- read_doc：读取文档原文。引用前必须先读取原文；检索片段只用于定位。\n- finish：提交结构化结果并结束本轮。不要直接用文字回答，必须通过 finish 提交。\n\n决策规则：\n1. 检索后读取相关文档原文，再作答。可能相关的文档都要读，以便发现规定不一致。\n2. 多份文档对同一事项规定不一致时，先在原文中查找适用范围、生效或替代关系等条款：\n   - 原文写明了适用范围或优先级：按原文分别说明，并引用这些条款，status=answered。\n   - 原文没有写明：status=conflict_needs_confirmation。在 answer 中列出每份文档的规定和版本日期，引用各自原文。不得因为版本日期较新或其他推测自行选定一个答案。\n   - 冲突时的 clarification_question 要给出可选项，逐一列出各文档的 ID 和标题，请用户选择适用哪份。只陈述原文中的规定，不得加入原文没有的推测（例如原文没提到的部门、费用类型或流程区分）。\n   - 同一事项按条件分档（如按工龄、城市分级）不是冲突，应按档位说明。\n3. 检索结果与问题无关时，最多换 2 次关键词；仍然完全找不到依据就 status=insufficient_evidence，在 gaps 中说明缺少什么资料，此时不附引用。\n   知识库只能回答问题的一部分时，用 status=answered：回答能回答的部分并引用，把缺失的部分写进 gaps。\n4. 工具返回 TOOL_UNAVAILABLE 时可以重试；同一工具连续 2 次不可用就不要再试，直接 status=tool_error，说明哪些资料未能获取，不得编造。\n5. 问题缺少必要条件、无法确定要查什么时（例如“这个”“那笔”没有可指代的对象），status=need_clarification，并在 clarification_question 中追问。\n6. 结合对话历史理解追问（如“那……呢”）。用户在历史中已确认适用哪份制度的，按用户确认的制度回答，并在 answer 中说明依据的是用户确认。\n7. citations 的 quote 必须逐字摘自 read_doc 返回的原文，可以截取片段，但不能改写、拼接或加省略号。answer 中出现的数字必须能在引用原文或用户问题中找到。\n   citations 只放支撑结论的原文，不为补充信息单独引用。\n8. answer 的格式：第一句直接给出结论；随后说明依据（文档和版本日期）；与问题没有直接关系的补充最多一条。\n9. 每次调用工具都在 reason 参数中用一句话说明为什么选择这一步。\n10. 本轮最多 8 步，每次工具结果会告诉你剩余步数。快用完时，用已有信息调用 finish。"
+            },
+            {
+              "role": "user",
+              "content": "当前问题：报销期限是多久？"
+            },
+            {
+              "role": "assistant",
+              "content": "我会先检索知识库中关于报销期限的规定。",
+              "tool_calls": [
+                {
+                  "id": "call_00_gyRUYMJkAp6PTb9APQ7J5432",
+                  "type": "function",
+                  "function": {
+                    "name": "search_docs",
+                    "arguments": "{\"query\": \"报销期限\", \"reason\": \"直接检索报销期限相关制度\"}"
+                  }
+                },
+                {
+                  "id": "call_01_LvYKkudFI0K3QqIzibXr0720",
+                  "type": "function",
+                  "function": {
+                    "name": "search_docs",
+                    "arguments": "{\"query\": \"费用报销 提交时间 规定\", \"reason\": \"换用制度原文可能出现的说法检索报销提交时限\"}"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "tool",
+              "tool_call_id": "call_00_gyRUYMJkAp6PTb9APQ7J5432",
+              "content": "{\"ok\": true, \"query\": \"报销期限\", \"result_count\": 5, \"results\": [{\"doc_id\": \"D01\", \"title\": \"费用报销管理办法\", \"version_date\": \"2023-03-01\", \"section_id\": \"D01-S2\", \"section_title\": \"报销期限\", \"snippet\": \"员工应在费用发生之日起 30 天内通过 OA 系统提交报销申请。超过期限的，须附部门负责人签字的情况说明。\", \"score\": 7.699, \"coverage\": 1.0, \"matched_terms\": [\"报销\", \"销期\", \"期限\"]}, {\"doc_id\": \"D02\", \"title\": \"费用报销操作指引\", \"version_date\": \"2024-05-20\", \"section_id\": \"D02-S1\", \"section_title\": \"报销提交期限\", \"snippet\": \"费用报销须在费用发生后 15 天内提交，逾期后系统将关闭该笔费用的报销入口。\", \"score\": 4.618, \"coverage\": 0.563, \"matched_terms\": [\"报销\", \"期限\"]}, {\"doc_id\": \"D01\", \"title\": \"费用报销管理办法\", \"version_date\": \"2023-03-01\", \"section_id\": \"D01-S3\", \"section_title\": \"报销材料\", \"snippet\": \"报销须提供合规的纸质发票或电子发票，以及费用明细单。单笔金额超过 5000 元的，须附事前审批单。\", \"score\": 2.132, \"coverage\": 0.206, \"matched_terms\": [\"报销\"]}, {\"doc_id\": \"D02\", \"title\": \"费用报销操作指引\", \"version_date\": \"2024-05-20\", \"section_id\": \"D02-S2\", \"section_title\": \"电子发票\", \"snippet\": \"电子发票须上传 PDF 或 OFD 格式的原文件，截图无效。同一张发票不得重复报销。\", \"score\": 1.933, \"coverage\": 0.206, \"matched_terms\": [\"报销\"]}, {\"doc_id\": \"D01\", \"title\": \"费用报销管理办法\", \"version_date\": \"2023-03-01\", \"section_id\": \"D01-S4\", \"section_title\": \"审批与付款\", \"snippet\": \"报销申请依次由直属上级、部门负责人和财务部审核。财务部在审核通过后 7 个工作日内完成付款。\", \"score\": 1.776, \"coverage\": 0.206, \"matched_terms\": [\"报销\"]}], \"steps_left\": 7}"
+            },
+            {
+              "role": "tool",
+              "tool_call_id": "call_01_LvYKkudFI0K3QqIzibXr0720",
+              "content": "{\"ok\": true, \"query\": \"费用报销 提交时间 规定\", \"result_count\": 5, \"results\": [{\"doc_id\": \"D02\", \"title\": \"费用报销操作指引\", \"version_date\": \"2024-05-20\", \"section_id\": \"D02-S1\", \"section_title\": \"报销提交期限\", \"snippet\": \"费用报销须在费用发生后 15 天内提交，逾期后系统将关闭该笔费用的报销入口。\", \"score\": 8.455, \"coverage\": 0.343, \"matched_terms\": [\"费用\", \"用报\", \"报销\", \"提交\"]}, {\"doc_id\": \"D01\", \"title\": \"费用报销管理办法\", \"version_date\": \"2023-03-01\", \"section_id\": \"D01-S2\", \"section_title\": \"报销期限\", \"snippet\": \"员工应在费用发生之日起 30 天内通过 OA 系统提交报销申请。超过期限的，须附部门负责人签字的情况说明。\", \"score\": 6.261, \"coverage\": 0.343, \"matched_terms\": [\"费用\", \"用报\", \"报销\", \"提交\"]}, {\"doc_id\": \"D01\", \"title\": \"费用报销管理办法\", \"version_date\": \"2023-03-01\", \"section_id\": \"D01-S1\", \"section_title\": \"适用范围\", \"snippet\": \"本办法适用于公司全体正式员工因公发生的日常费用报销，包括市内交通费、业务招待费和办公用品费。\", \"score\": 5.251, \"coverage\": 0.257, \"matched_terms\": [\"费用\", \"用报\", \"报销\"]}, {\"doc_id\": \"D01\", \"title\": \"费用报销管理办法\", \"version_date\": \"2023-03-01\", \"section_id\": \"D01-S3\", \"section_title\": \"报销材料\", \"snippet\": \"报销须提供合规的纸质发票或电子发票，以及费用明细单。单笔金额超过 5000 元的，须附事前审批单。\", \"score\": 5.207, \"coverage\": 0.257, \"matched_terms\": [\"费用\", \"用报\", \"报销\"]}, {\"doc_id\": \"D02\", \"title\": \"费用报销操作指引\", \"version_date\": \"2024-05-20\", \"section_id\": \"D02-S2\", \"section_title\": \"电子发票\", \"snippet\": \"电子发票须上传 PDF 或 OFD 格式的原文件，截图无效。同一张发票不得重复报销。\", \"score\": 4.679, \"coverage\": 0.257, \"matched_terms\": [\"费用\", \"用报\", \"报销\"]}], \"steps_left\": 7}"
+            },
+            {
+              "role": "assistant",
+              "content": "两份文档的规定不一致（30 天与 15 天），我需要读取原文，查看是否有适用范围或优先级条款。",
+              "tool_calls": [
+                {
+                  "id": "call_00_ygrjjHdUWuIjZ0y0oV1M2485",
+                  "type": "function",
+                  "function": {
+                    "name": "read_doc",
+                    "arguments": "{\"doc_id\": \"D01\", \"reason\": \"读取《费用报销管理办法》全文，查看适用范围与生效/替代条款\"}"
+                  }
+                },
+                {
+                  "id": "call_01_GPMG2tdQbTW2djwb0w9c6431",
+                  "type": "function",
+                  "function": {
+                    "name": "read_doc",
+                    "arguments": "{\"doc_id\": \"D02\", \"reason\": \"读取《费用报销操作指引》全文，查看适用范围与生效/替代条款\"}"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "tool",
+              "tool_call_id": "call_00_ygrjjHdUWuIjZ0y0oV1M2485",
+              "content": "{\"ok\": true, \"doc_id\": \"D01\", \"title\": \"费用报销管理办法\", \"version_date\": \"2023-03-01\", \"owner\": \"财务部\", \"sections\": [{\"section_id\": \"D01-S1\", \"title\": \"适用范围\", \"text\": \"本办法适用于公司全体正式员工因公发生的日常费用报销，包括市内交通费、业务招待费和办公用品费。\"}, {\"section_id\": \"D01-S2\", \"title\": \"报销期限\", \"text\": \"员工应在费用发生之日起 30 天内通过 OA 系统提交报销申请。超过期限的，须附部门负责人签字的情况说明。\"}, {\"section_id\": \"D01-S3\", \"title\": \"报销材料\", \"text\": \"报销须提供合规的纸质发票或电子发票，以及费用明细单。单笔金额超过 5000 元的，须附事前审批单。\"}, {\"section_id\": \"D01-S4\", \"title\": \"审批与付款\", \"text\": \"报销申请依次由直属上级、部门负责人和财务部审核。财务部在审核通过后 7 个工作日内完成付款。\"}], \"steps_left\": 6}"
+            },
+            {
+              "role": "tool",
+              "tool_call_id": "call_01_GPMG2tdQbTW2djwb0w9c6431",
+              "content": "{\"ok\": true, \"doc_id\": \"D02\", \"title\": \"费用报销操作指引\", \"version_date\": \"2024-05-20\", \"owner\": \"财务共享中心\", \"sections\": [{\"section_id\": \"D02-S1\", \"title\": \"报销提交期限\", \"text\": \"费用报销须在费用发生后 15 天内提交，逾期后系统将关闭该笔费用的报销入口。\"}, {\"section_id\": \"D02-S2\", \"title\": \"电子发票\", \"text\": \"电子发票须上传 PDF 或 OFD 格式的原文件，截图无效。同一张发票不得重复报销。\"}], \"steps_left\": 6}"
+            },
+            {
+              "role": "assistant",
+              "content": "两份文档对报销期限的规定不一致，且都没有写明适用范围或优先级关系，需要用户确认。",
+              "tool_calls": [
+                {
+                  "id": "call_00_Id15ofyGjKB3Cqcik2Fz4920",
+                  "type": "function",
+                  "function": {
+                    "name": "finish",
+                    "arguments": "{\"status\": \"conflict_needs_confirmation\", \"answer\": \"知识库中两份文档对报销期限的规定不一致，且原文均未写明适用范围或替代/优先级关系，需要您确认适用哪一份：\\n\\n1. 《费用报销管理办法》（D01，财务部，版本日期 2023-03-01）\\\"报销期限\\\"：员工应在费用发生之日起 30 天内通过 OA 系统提交报销申请。超过期限的，须附部门负责人签字的情况说明。\\n2. 《费用报销操作指引》（D02，财务共享中心，版本日期 2024-05-20）\\\"报销提交期限\\\"：费用报销须在费用发生后 15 天内提交，逾期后系统将关闭该笔费用的报销入口。\\n\\n两份文档的差异不仅在天数（30 天与 15 天），逾期后果也不同（D01 允许附情况说明，D02 是系统关闭报销入口）。D01 的适用范围条款只说明适用于公司全体正式员工因公发生的日常费用报销（含市内交通费、业务招待费和办公用品费），未说明与 D02 的关系；D02 未设适用范围条款。\", \"citations\": [{\"doc_id\": \"D01\", \"quote\": \"员工应在费用发生之日起 30 天内通过 OA 系统提交报销申请。超过期限的，须附部门负责人签字的情况说明。\"}, {\"doc_id\": \"D02\", \"quote\": \"费用报销须在费用发生后 15 天内提交，逾期后系统将关闭该笔费用的报销入口。\"}, {\"doc_id\": \"D01\", \"quote\": \"本办法适用于公司全体正式员工因公发生的日常费用报销，包括市内交通费、业务招待费和办公用品费。\"}], \"gaps\": [\"两份文档均未写明相互之间的适用关系、优先级或替代关系，无法判断以哪一份为准\", \"D02《费用报销操作指引》未设适用范围条款，无法确定其覆盖的费用类型或人员范围\"], \"clarification_question\": \"请确认您要适用哪一份文档的规定：①D01《费用报销管理办法》（2023-03-01，30 天内提交，逾期须附部门负责人签字的情况说明）；②D02《费用报销操作指引》（2024-05-20，15 天内提交，逾期系统关闭报销入口）。\", \"reason\": \"两份文档对报销期限规定不一致，且原文均无适用范围或优先级条款，按规则需请用户确认适用哪份。\"}"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "tool",
+              "tool_call_id": "call_00_Id15ofyGjKB3Cqcik2Fz4920",
+              "content": "{\"ok\": true, \"accepted\": true, \"steps_left\": 5}"
+            }
+          ],
+          "error": ""
+        }
+      }
+    ]
+  },
+  {
+    "case_id": "C03_conflict",
+    "acceptance": [
+      "文档冲突"
+    ],
+    "description": "题目参考实例：D01 写 30 天、D02 写 15 天，均未写适用范围和优先级。应列出冲突并请求确认，不能擅自回答 15 天。",
+    "provider": "openai",
+    "model": "deepseek-chat",
+    "options": {},
+    "generated_at": "2026-11-02T18:34:38+08:00",
+    "passed": true,
+    "turns": [
+      {
+        "question": "报销期限是多久？",
+        "history_in": [],
+        "expect": {
+          "status": [
+            "conflict_needs_confirmation"
+          ],
+          "cited_docs_include": [
+            "D01",
+            "D02"
+          ],
+          "answer_contains_all": [
+            "30",
+            "15"
+          ]
+        },
+        "expect_source": "expect",
+        "checks": [
+          {
+            "name": "status",
+            "passed": true,
+            "detail": "实际 conflict_needs_confirmation，期望 ['conflict_needs_confirmation']"
+          },
+          {
+            "name": "引用包含",
+            "passed": true,
+            "detail": "实际引用 ['D01', 'D02']"
+          },
+          {
+            "name": "回答包含全部",
+            "passed": true,
+            "detail": "全部包含"
+          }
+        ],
+        "passed": true,
+        "result": {
+          "status": "conflict_needs_confirmation",
+          "answer": "知识库中两份文档对报销期限的规定不一致，且原文均未写明适用范围或替代/优先级关系，无法确定以哪份为准：\n\n1. 《费用报销管理办法》（D01，版本日期 2023-03-01，财务部）：员工应在费用发生之日起 30 天内通过 OA 系统提交报销申请；超过期限的，须附部门负责人签字的情况说明。\n2. 《费用报销操作指引》（D02，版本日期 2024-05-20，财务共享中心）：费用报销须在费用发生后 15 天内提交，逾期后系统将关闭该笔费用的报销入口。\n\n请确认您适用哪份文档的规定。",
+          "citations": [
+            {
+              "doc_id": "D01",
+              "title": "费用报销管理办法",
+              "version_date": "2023-03-01",
+              "quote": "员工应在费用发生之日起 30 天内通过 OA 系统提交报销申请。超过期限的，须附部门负责人签字的情况说明。"
+            },
+            {
+              "doc_id": "D02",
+              "title": "费用报销操作指引",
+              "version_date": "2024-05-20",
+              "quote": "费用报销须在费用发生后 15 天内提交，逾期后系统将关闭该笔费用的报销入口。"
+            }
+          ],
+          "gaps": [
+            "两份文档均未写明适用范围、生效或替代关系，无法判断 30 天与 15 天哪个适用"
+          ],
+          "clarification_question": "请确认适用哪份文档的规定：①D01《费用报销管理办法》（2023-03-01，30 天内提交，超期需附部门负责人签字的情况说明）；②D02《费用报销操作指引》（2024-05-20，15 天内提交，逾期系统关闭报销入口）。",
+          "stop_reason": "finished",
+          "steps_used": 3,
+          "tool_calls_used": 4,
+          "limits": {
+            "max_steps": 8,
+            "max_tool_calls": 12
+          },
+          "trace": [
+            {
+              "step": 1,
+              "action": "search_docs",
+              "arguments": {
+                "query": "报销期限"
+              },
+              "reason": "直接检索用户问的报销期限规定",
+              "llm_ms": 1106,
+              "usage": {
+                "prompt_tokens": 1596,
+                "completion_tokens": 133
+              },
+              "ok": true,
+              "observation": "检索“报销期限”：5 条 — D01-S2(7.699), D02-S1(4.618), D01-S3(2.132), D02-S2(1.933), D01-S4(1.776)",
+              "next_action": "search_docs"
+            },
+            {
+              "step": 1,
+              "action": "search_docs",
+              "arguments": {
+                "query": "费用报销 提交时间 规定"
+              },
+              "reason": "换用制度原文可能出现的说法检索报销提交时限",
+              "llm_ms": 1106,
+              "usage": {
+                "prompt_tokens": 1596,
+                "completion_tokens": 133
+              },
+              "ok": true,
+              "observation": "检索“费用报销 提交时间 规定”：5 条 — D02-S1(8.455), D01-S2(6.261), D01-S1(5.251), D01-S3(5.207), D02-S2(4.679)",
+              "next_action": "read_doc"
+            },
+            {
+              "step": 2,
+              "action": "read_doc",
+              "arguments": {
+                "doc_id": "D01"
+              },
+              "reason": "读取《费用报销管理办法》全文，确认报销期限规定及适用范围/优先级条款",
+              "llm_ms": 1289,
+              "usage": {
+                "prompt_tokens": 2920,
+                "completion_tokens": 160
+              },
+              "ok": true,
+              "observation": "读取 D01《费用报销管理办法》(2023-03-01)：D01-S1, D01-S2, D01-S3, D01-S4",
+              "next_action": "read_doc"
+            },
+            {
+              "step": 2,
+              "action": "read_doc",
+              "arguments": {
+                "doc_id": "D02"
+              },
+              "reason": "读取《费用报销操作指引》全文，确认报销期限规定及适用范围/优先级条款",
+              "llm_ms": 1289,
+              "usage": {
+                "prompt_tokens": 2920,
+                "completion_tokens": 160
+              },
+              "ok": true,
+              "observation": "读取 D02《费用报销操作指引》(2024-05-20)：D02-S1, D02-S2",
+              "next_action": "finish"
+            },
+            {
+              "step": 3,
+              "action": "finish",
+              "arguments": {
+                "status": "conflict_needs_confirmation",
+                "answer": "知识库中两份文档对报销期限的规定不一致，且原文均未写明适用范围或替代/优先级关系，无法确定以哪份为准：\n\n1. 《费用报销管理办法》（D01，版本日期 2023-03-01，财务部）：员工应在费用发生之日起 30 天内通过 OA 系统提交报销申请；超过期限的，须附部门负责人签字的情况说明。\n2. 《费用报销操作指引》（D02，版本日期 2024-05-20，财务共享中心）：费用报销须在费用发生后 15 天内提交，逾期后系统将关闭该笔费用的报销入口。\n\n请确认您适用哪份文档的规定。",
+                "citations": [
+                  {
+                    "doc_id": "D01",
+                    "quote": "员工应在费用发生之日起 30 天内通过 OA 系统提交报销申请。超过期限的，须附部门负责人签字的情况说明。"
+                  },
+                  {
+                    "doc_id": "D02",
+                    "quote": "费用报销须在费用发生后 15 天内提交，逾期后系统将关闭该笔费用的报销入口。"
+                  }
+                ],
+                "gaps": [
+                  "两份文档均未写明适用范围、生效或替代关系，无法判断 30 天与 15 天哪个适用"
+                ],
+                "clarification_question": "请确认适用哪份文档的规定：①D01《费用报销管理办法》（2023-03-01，30 天内提交，超期需附部门负责人签字的情况说明）；②D02《费用报销操作指引》（2024-05-20，15 天内提交，逾期系统关闭报销入口）。"
+              },
+              "reason": "两份文档对报销期限规定不一致且原文未写明适用范围或优先级，按规则需请用户确认。",
+              "llm_ms": 2751,
+              "usage": {
+                "prompt_tokens": 3500,
+                "completion_tokens": 471
+              },
+              "ok": true,
+              "observation": "结果通过校验，本轮结束",
+              "next_action": "（结束）"
+            }
+          ],
+          "transcript": [
+            {
+              "role": "system",
+              "content": "你是企业内部知识库问答助手，帮助员工查询公司制度和产品 FAQ。你只能依据工具返回的知识库原文回答，不能使用常识或外部知识补全。\n\n工作方式：每一步调用一个工具，观察结果后决定下一步。可用工具：\n- search_docs：检索知识库。结果为空或与问题无关时，可以换成制度原文里可能出现的说法再检索。\n- read_doc：读取文档原文。引用前必须先读取原文；检索片段只用于定位。\n- finish：提交结构化结果并结束本轮。不要直接用文字回答，必须通过 finish 提交。\n\n决策规则：\n1. 检索后读取相关文档原文，再作答。可能相关的文档都要读，以便发现规定不一致。\n2. 多份文档对同一事项规定不一致时，先在原文中查找适用范围、生效或替代关系等条款：\n   - 原文写明了适用范围或优先级：按原文分别说明，并引用这些条款，status=answered。\n   - 原文没有写明：status=conflict_needs_confirmation。在 answer 中列出每份文档的规定和版本日期，引用各自原文。不得因为版本日期较新或其他推测自行选定一个答案。\n   - 冲突时的 clarification_question 要给出可选项，逐一列出各文档的 ID 和标题，请用户选择适用哪份。只陈述原文中的规定，不得加入原文没有的推测（例如原文没提到的部门、费用类型或流程区分）。\n   - 同一事项按条件分档（如按工龄、城市分级）不是冲突，应按档位说明。\n3. 检索结果与问题无关时，最多换 2 次关键词；仍然完全找不到依据就 status=insufficient_evidence，在 gaps 中说明缺少什么资料，此时不附引用。\n   知识库只能回答问题的一部分时，用 status=answered：回答能回答的部分并引用，把缺失的部分写进 gaps。\n4. 工具返回 TOOL_UNAVAILABLE 时可以重试；同一工具连续 2 次不可用就不要再试，直接 status=tool_error，说明哪些资料未能获取，不得编造。\n5. 问题缺少必要条件、无法确定要查什么时（例如“这个”“那笔”没有可指代的对象），status=need_clarification，并在 clarification_question 中追问。\n6. 结合对话历史理解追问（如“那……呢”）。用户在历史中已确认适用哪份制度的，按用户确认的制度回答，并在 answer 中说明依据的是用户确认。\n7. citations 的 quote 必须逐字摘自 read_doc 返回的原文，可以截取片段，但不能改写、拼接或加省略号。answer 中出现的数字必须能在引用原文或用户问题中找到。\n   citations 只放支撑结论的原文，不为补充信息单独引用。\n8. answer 的格式：第一句直接给出结论；随后说明依据（文档和版本日期）；与问题没有直接关系的补充最多一条。\n9. 每次调用工具都在 reason 参数中用一句话说明为什么选择这一步。\n10. 本轮最多 8 步，每次工具结果会告诉你剩余步数。快用完时，用已有信息调用 finish。"
+            },
+            {
+              "role": "user",
+              "content": "当前问题：报销期限是多久？"
+            },
+            {
+              "role": "assistant",
+              "content": "我会先在知识库中检索报销期限的相关规定。",
+              "tool_calls": [
+                {
+                  "id": "call_00_tl5ew2ypGFj1NSje5ELV5722",
+                  "type": "function",
+                  "function": {
+                    "name": "search_docs",
+                    "arguments": "{\"query\": \"报销期限\", \"reason\": \"直接检索用户问的报销期限规定\"}"
+                  }
+                },
+                {
+                  "id": "call_01_vSsMU88Xf6Cjvh8WO1IF5748",
+                  "type": "function",
+                  "function": {
+                    "name": "search_docs",
+                    "arguments": "{\"query\": \"费用报销 提交时间 规定\", \"reason\": \"换用制度原文可能出现的说法检索报销提交时限\"}"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "tool",
+              "tool_call_id": "call_00_tl5ew2ypGFj1NSje5ELV5722",
+              "content": "{\"ok\": true, \"query\": \"报销期限\", \"result_count\": 5, \"results\": [{\"doc_id\": \"D01\", \"title\": \"费用报销管理办法\", \"version_date\": \"2023-03-01\", \"section_id\": \"D01-S2\", \"section_title\": \"报销期限\", \"snippet\": \"员工应在费用发生之日起 30 天内通过 OA 系统提交报销申请。超过期限的，须附部门负责人签字的情况说明。\", \"score\": 7.699, \"coverage\": 1.0, \"matched_terms\": [\"报销\", \"销期\", \"期限\"]}, {\"doc_id\": \"D02\", \"title\": \"费用报销操作指引\", \"version_date\": \"2024-05-20\", \"section_id\": \"D02-S1\", \"section_title\": \"报销提交期限\", \"snippet\": \"费用报销须在费用发生后 15 天内提交，逾期后系统将关闭该笔费用的报销入口。\", \"score\": 4.618, \"coverage\": 0.563, \"matched_terms\": [\"报销\", \"期限\"]}, {\"doc_id\": \"D01\", \"title\": \"费用报销管理办法\", \"version_date\": \"2023-03-01\", \"section_id\": \"D01-S3\", \"section_title\": \"报销材料\", \"snippet\": \"报销须提供合规的纸质发票或电子发票，以及费用明细单。单笔金额超过 5000 元的，须附事前审批单。\", \"score\": 2.132, \"coverage\": 0.206, \"matched_terms\": [\"报销\"]}, {\"doc_id\": \"D02\", \"title\": \"费用报销操作指引\", \"version_date\": \"2024-05-20\", \"section_id\": \"D02-S2\", \"section_title\": \"电子发票\", \"snippet\": \"电子发票须上传 PDF 或 OFD 格式的原文件，截图无效。同一张发票不得重复报销。\", \"score\": 1.933, \"coverage\": 0.206, \"matched_terms\": [\"报销\"]}, {\"doc_id\": \"D01\", \"title\": \"费用报销管理办法\", \"version_date\": \"2023-03-01\", \"section_id\": \"D01-S4\", \"section_title\": \"审批与付款\", \"snippet\": \"报销申请依次由直属上级、部门负责人和财务部审核。财务部在审核通过后 7 个工作日内完成付款。\", \"score\": 1.776, \"coverage\": 0.206, \"matched_terms\": [\"报销\"]}], \"steps_left\": 7}"
+            },
+            {
+              "role": "tool",
+              "tool_call_id": "call_01_vSsMU88Xf6Cjvh8WO1IF5748",
+              "content": "{\"ok\": true, \"query\": \"费用报销 提交时间 规定\", \"result_count\": 5, \"results\": [{\"doc_id\": \"D02\", \"title\": \"费用报销操作指引\", \"version_date\": \"2024-05-20\", \"section_id\": \"D02-S1\", \"section_title\": \"报销提交期限\", \"snippet\": \"费用报销须在费用发生后 15 天内提交，逾期后系统将关闭该笔费用的报销入口。\", \"score\": 8.455, \"coverage\": 0.343, \"matched_terms\": [\"费用\", \"用报\", \"报销\", \"提交\"]}, {\"doc_id\": \"D01\", \"title\": \"费用报销管理办法\", \"version_date\": \"2023-03-01\", \"section_id\": \"D01-S2\", \"section_title\": \"报销期限\", \"snippet\": \"员工应在费用发生之日起 30 天内通过 OA 系统提交报销申请。超过期限的，须附部门负责人签字的情况说明。\", \"score\": 6.261, \"coverage\": 0.343, \"matched_terms\": [\"费用\", \"用报\", \"报销\", \"提交\"]}, {\"doc_id\": \"D01\", \"title\": \"费用报销管理办法\", \"version_date\": \"2023-03-01\", \"section_id\": \"D01-S1\", \"section_title\": \"适用范围\", \"snippet\": \"本办法适用于公司全体正式员工因公发生的日常费用报销，包括市内交通费、业务招待费和办公用品费。\", \"score\": 5.251, \"coverage\": 0.257, \"matched_terms\": [\"费用\", \"用报\", \"报销\"]}, {\"doc_id\": \"D01\", \"title\": \"费用报销管理办法\", \"version_date\": \"2023-03-01\", \"section_id\": \"D01-S3\", \"section_title\": \"报销材料\", \"snippet\": \"报销须提供合规的纸质发票或电子发票，以及费用明细单。单笔金额超过 5000 元的，须附事前审批单。\", \"score\": 5.207, \"coverage\": 0.257, \"matched_terms\": [\"费用\", \"用报\", \"报销\"]}, {\"doc_id\": \"D02\", \"title\": \"费用报销操作指引\", \"version_date\": \"2024-05-20\", \"section_id\": \"D02-S2\", \"section_title\": \"电子发票\", \"snippet\": \"电子发票须上传 PDF 或 OFD 格式的原文件，截图无效。同一张发票不得重复报销。\", \"score\": 4.679, \"coverage\": 0.257, \"matched_terms\": [\"费用\", \"用报\", \"报销\"]}], \"steps_left\": 7}"
+            },
+            {
+              "role": "assistant",
+              "content": "两份文档的规定不一致（30 天与 15 天），我需要读取原文，查看是否有适用范围或优先级条款。",
+              "tool_calls": [
+                {
+                  "id": "call_00_2f3Hmadzh5cLyKTcmKN01717",
+                  "type": "function",
+                  "function": {
+                    "name": "read_doc",
+                    "arguments": "{\"doc_id\": \"D01\", \"reason\": \"读取《费用报销管理办法》全文，确认报销期限规定及适用范围/优先级条款\"}"
+                  }
+                },
+                {
+                  "id": "call_01_ngQnouHWCjaT4CpQBfNF6941",
+                  "type": "function",
+                  "function": {
+                    "name": "read_doc",
+                    "arguments": "{\"doc_id\": \"D02\", \"reason\": \"读取《费用报销操作指引》全文，确认报销期限规定及适用范围/优先级条款\"}"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "tool",
+              "tool_call_id": "call_00_2f3Hmadzh5cLyKTcmKN01717",
+              "content": "{\"ok\": true, \"doc_id\": \"D01\", \"title\": \"费用报销管理办法\", \"version_date\": \"2023-03-01\", \"owner\": \"财务部\", \"sections\": [{\"section_id\": \"D01-S1\", \"title\": \"适用范围\", \"text\": \"本办法适用于公司全体正式员工因公发生的日常费用报销，包括市内交通费、业务招待费和办公用品费。\"}, {\"section_id\": \"D01-S2\", \"title\": \"报销期限\", \"text\": \"员工应在费用发生之日起 30 天内通过 OA 系统提交报销申请。超过期限的，须附部门负责人签字的情况说明。\"}, {\"section_id\": \"D01-S3\", \"title\": \"报销材料\", \"text\": \"报销须提供合规的纸质发票或电子发票，以及费用明细单。单笔金额超过 5000 元的，须附事前审批单。\"}, {\"section_id\": \"D01-S4\", \"title\": \"审批与付款\", \"text\": \"报销申请依次由直属上级、部门负责人和财务部审核。财务部在审核通过后 7 个工作日内完成付款。\"}], \"steps_left\": 6}"
+            },
+            {
+              "role": "tool",
+              "tool_call_id": "call_01_ngQnouHWCjaT4CpQBfNF6941",
+              "content": "{\"ok\": true, \"doc_id\": \"D02\", \"title\": \"费用报销操作指引\", \"version_date\": \"2024-05-20\", \"owner\": \"财务共享中心\", \"sections\": [{\"section_id\": \"D02-S1\", \"title\": \"报销提交期限\", \"text\": \"费用报销须在费用发生后 15 天内提交，逾期后系统将关闭该笔费用的报销入口。\"}, {\"section_id\": \"D02-S2\", \"title\": \"电子发票\", \"text\": \"电子发票须上传 PDF 或 OFD 格式的原文件，截图无效。同一张发票不得重复报销。\"}], \"steps_left\": 6}"
+            },
+            {
+              "role": "assistant",
+              "content": "两份文档对报销期限的规定不一致，且都没有写明适用范围或替代关系，需要用户确认。",
+              "tool_calls": [
+                {
+                  "id": "call_00_HShLE8G7b693yTc94C7f2235",
+                  "type": "function",
+                  "function": {
+                    "name": "finish",
+                    "arguments": "{\"status\": \"conflict_needs_confirmation\", \"answer\": \"知识库中两份文档对报销期限的规定不一致，且原文均未写明适用范围或替代/优先级关系，无法确定以哪份为准：\\n\\n1. 《费用报销管理办法》（D01，版本日期 2023-03-01，财务部）：员工应在费用发生之日起 30 天内通过 OA 系统提交报销申请；超过期限的，须附部门负责人签字的情况说明。\\n2. 《费用报销操作指引》（D02，版本日期 2024-05-20，财务共享中心）：费用报销须在费用发生后 15 天内提交，逾期后系统将关闭该笔费用的报销入口。\\n\\n请确认您适用哪份文档的规定。\", \"citations\": [{\"doc_id\": \"D01\", \"quote\": \"员工应在费用发生之日起 30 天内通过 OA 系统提交报销申请。超过期限的，须附部门负责人签字的情况说明。\"}, {\"doc_id\": \"D02\", \"quote\": \"费用报销须在费用发生后 15 天内提交，逾期后系统将关闭该笔费用的报销入口。\"}], \"gaps\": [\"两份文档均未写明适用范围、生效或替代关系，无法判断 30 天与 15 天哪个适用\"], \"clarification_question\": \"请确认适用哪份文档的规定：①D01《费用报销管理办法》（2023-03-01，30 天内提交，超期需附部门负责人签字的情况说明）；②D02《费用报销操作指引》（2024-05-20，15 天内提交，逾期系统关闭报销入口）。\", \"reason\": \"两份文档对报销期限规定不一致且原文未写明适用范围或优先级，按规则需请用户确认。\"}"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "tool",
+              "tool_call_id": "call_00_HShLE8G7b693yTc94C7f2235",
+              "content": "{\"ok\": true, \"accepted\": true, \"steps_left\": 5}"
+            }
+          ],
+          "error": ""
+        }
+      }
+    ]
+  },
+  {
+    "case_id": "C03_conflict",
+    "acceptance": [
+      "文档冲突"
+    ],
+    "description": "题目参考实例：D01 写 30 天、D02 写 15 天，均未写适用范围和优先级。应列出冲突并请求确认，不能擅自回答 15 天。",
+    "provider": "openai",
+    "model": "deepseek-chat",
+    "options": {},
+    "generated_at": "2026-11-02T18:34:44+08:00",
+    "passed": true,
+    "turns": [
+      {
+        "question": "报销期限是多久？",
+        "history_in": [],
+        "expect": {
+          "status": [
+            "conflict_needs_confirmation"
+          ],
+          "cited_docs_include": [
+            "D01",
+            "D02"
+          ],
+          "answer_contains_all": [
+            "30",
+            "15"
+          ]
+        },
+        "expect_source": "expect",
+        "checks": [
+          {
+            "name": "status",
+            "passed": true,
+            "detail": "实际 conflict_needs_confirmation，期望 ['conflict_needs_confirmation']"
+          },
+          {
+            "name": "引用包含",
+            "passed": true,
+            "detail": "实际引用 ['D01', 'D02']"
+          },
+          {
+            "name": "回答包含全部",
+            "passed": true,
+            "detail": "全部包含"
+          }
+        ],
+        "passed": true,
+        "result": {
+          "status": "conflict_needs_confirmation",
+          "answer": "知识库中两份文档对报销期限的规定不一致，且均未写明适用范围或替代关系，需要您确认适用哪一份：\n\n1. 《费用报销管理办法》（D01，版本日期 2023-03-01，财务部）：员工应在费用发生之日起 30 天内通过 OA 系统提交报销申请；超过期限的，须附部门负责人签字的情况说明。\n2. 《费用报销操作指引》（D02，版本日期 2024-05-20，财务共享中心）：费用报销须在费用发生后 15 天内提交，逾期后系统将关闭该笔费用的报销入口。\n\n两份文档的期限（30 天 / 15 天）和逾期后果（附情况说明 / 系统关闭入口）都不同，原文没有说明哪份优先或各自适用于什么情形，因此不能自行选定一个答案。",
+          "citations": [
+            {
+              "doc_id": "D01",
+              "title": "费用报销管理办法",
+              "version_date": "2023-03-01",
+              "quote": "员工应在费用发生之日起 30 天内通过 OA 系统提交报销申请。超过期限的，须附部门负责人签字的情况说明。"
+            },
+            {
+              "doc_id": "D02",
+              "title": "费用报销操作指引",
+              "version_date": "2024-05-20",
+              "quote": "费用报销须在费用发生后 15 天内提交，逾期后系统将关闭该笔费用的报销入口。"
+            }
+          ],
+          "gaps": [
+            "两份文档均未写明适用范围、生效或替代关系，无法判断哪一份适用于当前报销场景"
+          ],
+          "clarification_question": "请确认您要适用哪份文档的规定：① D01《费用报销管理办法》（2023-03-01，30 天内提交，逾期须附部门负责人签字的情况说明）；② D02《费用报销操作指引》（2024-05-20，15 天内提交，逾期系统关闭报销入口）。",
+          "stop_reason": "finished",
+          "steps_used": 3,
+          "tool_calls_used": 4,
+          "limits": {
+            "max_steps": 8,
+            "max_tool_calls": 12
+          },
+          "trace": [
+            {
+              "step": 1,
+              "action": "search_docs",
+              "arguments": {
+                "query": "报销期限"
+              },
+              "reason": "直接检索用户问的报销期限规定",
+              "llm_ms": 1376,
+              "usage": {
+                "prompt_tokens": 1596,
+                "completion_tokens": 133
+              },
+              "ok": true,
+              "observation": "检索“报销期限”：5 条 — D01-S2(7.699), D02-S1(4.618), D01-S3(2.132), D02-S2(1.933), D01-S4(1.776)",
+              "next_action": "search_docs"
+            },
+            {
+              "step": 1,
+              "action": "search_docs",
+              "arguments": {
+                "query": "费用报销 提交时间 规定"
+              },
+              "reason": "换用制度原文可能出现的说法检索报销提交时限",
+              "llm_ms": 1376,
+              "usage": {
+                "prompt_tokens": 1596,
+                "completion_tokens": 133
+              },
+              "ok": true,
+              "observation": "检索“费用报销 提交时间 规定”：5 条 — D02-S1(8.455), D01-S2(6.261), D01-S1(5.251), D01-S3(5.207), D02-S2(4.679)",
+              "next_action": "read_doc"
+            },
+            {
+              "step": 2,
+              "action": "read_doc",
+              "arguments": {
+                "doc_id": "D01"
+              },
+              "reason": "读取《费用报销管理办法》全文，确认报销期限规定及适用范围、优先级条款",
+              "llm_ms": 1689,
+              "usage": {
+                "prompt_tokens": 2920,
+                "completion_tokens": 161
+              },
+              "ok": true,
+              "observation": "读取 D01《费用报销管理办法》(2023-03-01)：D01-S1, D01-S2, D01-S3, D01-S4",
+              "next_action": "read_doc"
+            },
+            {
+              "step": 2,
+              "action": "read_doc",
+              "arguments": {
+                "doc_id": "D02"
+              },
+              "reason": "读取《费用报销操作指引》全文，确认报销期限规定及适用范围、替代关系条款",
+              "llm_ms": 1689,
+              "usage": {
+                "prompt_tokens": 2920,
+                "completion_tokens": 161
+              },
+              "ok": true,
+              "observation": "读取 D02《费用报销操作指引》(2024-05-20)：D02-S1, D02-S2",
+              "next_action": "finish"
+            },
+            {
+              "step": 3,
+              "action": "finish",
+              "arguments": {
+                "status": "conflict_needs_confirmation",
+                "answer": "知识库中两份文档对报销期限的规定不一致，且均未写明适用范围或替代关系，需要您确认适用哪一份：\n\n1. 《费用报销管理办法》（D01，版本日期 2023-03-01，财务部）：员工应在费用发生之日起 30 天内通过 OA 系统提交报销申请；超过期限的，须附部门负责人签字的情况说明。\n2. 《费用报销操作指引》（D02，版本日期 2024-05-20，财务共享中心）：费用报销须在费用发生后 15 天内提交，逾期后系统将关闭该笔费用的报销入口。\n\n两份文档的期限（30 天 / 15 天）和逾期后果（附情况说明 / 系统关闭入口）都不同，原文没有说明哪份优先或各自适用于什么情形，因此不能自行选定一个答案。",
+                "citations": [
+                  {
+                    "doc_id": "D01",
+                    "quote": "员工应在费用发生之日起 30 天内通过 OA 系统提交报销申请。超过期限的，须附部门负责人签字的情况说明。"
+                  },
+                  {
+                    "doc_id": "D02",
+                    "quote": "费用报销须在费用发生后 15 天内提交，逾期后系统将关闭该笔费用的报销入口。"
+                  }
+                ],
+                "gaps": [
+                  "两份文档均未写明适用范围、生效或替代关系，无法判断哪一份适用于当前报销场景"
+                ],
+                "clarification_question": "请确认您要适用哪份文档的规定：① D01《费用报销管理办法》（2023-03-01，30 天内提交，逾期须附部门负责人签字的情况说明）；② D02《费用报销操作指引》（2024-05-20，15 天内提交，逾期系统关闭报销入口）。"
+              },
+              "reason": "两份文档对报销期限规定不一致且原文未写明适用范围或优先级，按规则需请用户确认适用哪份。",
+              "llm_ms": 2946,
+              "usage": {
+                "prompt_tokens": 3501,
+                "completion_tokens": 507
+              },
+              "ok": true,
+              "observation": "结果通过校验，本轮结束",
+              "next_action": "（结束）"
+            }
+          ],
+          "transcript": [
+            {
+              "role": "system",
+              "content": "你是企业内部知识库问答助手，帮助员工查询公司制度和产品 FAQ。你只能依据工具返回的知识库原文回答，不能使用常识或外部知识补全。\n\n工作方式：每一步调用一个工具，观察结果后决定下一步。可用工具：\n- search_docs：检索知识库。结果为空或与问题无关时，可以换成制度原文里可能出现的说法再检索。\n- read_doc：读取文档原文。引用前必须先读取原文；检索片段只用于定位。\n- finish：提交结构化结果并结束本轮。不要直接用文字回答，必须通过 finish 提交。\n\n决策规则：\n1. 检索后读取相关文档原文，再作答。可能相关的文档都要读，以便发现规定不一致。\n2. 多份文档对同一事项规定不一致时，先在原文中查找适用范围、生效或替代关系等条款：\n   - 原文写明了适用范围或优先级：按原文分别说明，并引用这些条款，status=answered。\n   - 原文没有写明：status=conflict_needs_confirmation。在 answer 中列出每份文档的规定和版本日期，引用各自原文。不得因为版本日期较新或其他推测自行选定一个答案。\n   - 冲突时的 clarification_question 要给出可选项，逐一列出各文档的 ID 和标题，请用户选择适用哪份。只陈述原文中的规定，不得加入原文没有的推测（例如原文没提到的部门、费用类型或流程区分）。\n   - 同一事项按条件分档（如按工龄、城市分级）不是冲突，应按档位说明。\n3. 检索结果与问题无关时，最多换 2 次关键词；仍然完全找不到依据就 status=insufficient_evidence，在 gaps 中说明缺少什么资料，此时不附引用。\n   知识库只能回答问题的一部分时，用 status=answered：回答能回答的部分并引用，把缺失的部分写进 gaps。\n4. 工具返回 TOOL_UNAVAILABLE 时可以重试；同一工具连续 2 次不可用就不要再试，直接 status=tool_error，说明哪些资料未能获取，不得编造。\n5. 问题缺少必要条件、无法确定要查什么时（例如“这个”“那笔”没有可指代的对象），status=need_clarification，并在 clarification_question 中追问。\n6. 结合对话历史理解追问（如“那……呢”）。用户在历史中已确认适用哪份制度的，按用户确认的制度回答，并在 answer 中说明依据的是用户确认。\n7. citations 的 quote 必须逐字摘自 read_doc 返回的原文，可以截取片段，但不能改写、拼接或加省略号。answer 中出现的数字必须能在引用原文或用户问题中找到。\n   citations 只放支撑结论的原文，不为补充信息单独引用。\n8. answer 的格式：第一句直接给出结论；随后说明依据（文档和版本日期）；与问题没有直接关系的补充最多一条。\n9. 每次调用工具都在 reason 参数中用一句话说明为什么选择这一步。\n10. 本轮最多 8 步，每次工具结果会告诉你剩余步数。快用完时，用已有信息调用 finish。"
+            },
+            {
+              "role": "user",
+              "content": "当前问题：报销期限是多久？"
+            },
+            {
+              "role": "assistant",
+              "content": "我会先在知识库中检索报销期限的相关规定。",
+              "tool_calls": [
+                {
+                  "id": "call_00_ipcuoicHcv2Hm2cp6pgb6579",
+                  "type": "function",
+                  "function": {
+                    "name": "search_docs",
+                    "arguments": "{\"query\": \"报销期限\", \"reason\": \"直接检索用户问的报销期限规定\"}"
+                  }
+                },
+                {
+                  "id": "call_01_lAA5cyCSYoTVD8On8FCx9187",
+                  "type": "function",
+                  "function": {
+                    "name": "search_docs",
+                    "arguments": "{\"query\": \"费用报销 提交时间 规定\", \"reason\": \"换用制度原文可能出现的说法检索报销提交时限\"}"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "tool",
+              "tool_call_id": "call_00_ipcuoicHcv2Hm2cp6pgb6579",
+              "content": "{\"ok\": true, \"query\": \"报销期限\", \"result_count\": 5, \"results\": [{\"doc_id\": \"D01\", \"title\": \"费用报销管理办法\", \"version_date\": \"2023-03-01\", \"section_id\": \"D01-S2\", \"section_title\": \"报销期限\", \"snippet\": \"员工应在费用发生之日起 30 天内通过 OA 系统提交报销申请。超过期限的，须附部门负责人签字的情况说明。\", \"score\": 7.699, \"coverage\": 1.0, \"matched_terms\": [\"报销\", \"销期\", \"期限\"]}, {\"doc_id\": \"D02\", \"title\": \"费用报销操作指引\", \"version_date\": \"2024-05-20\", \"section_id\": \"D02-S1\", \"section_title\": \"报销提交期限\", \"snippet\": \"费用报销须在费用发生后 15 天内提交，逾期后系统将关闭该笔费用的报销入口。\", \"score\": 4.618, \"coverage\": 0.563, \"matched_terms\": [\"报销\", \"期限\"]}, {\"doc_id\": \"D01\", \"title\": \"费用报销管理办法\", \"version_date\": \"2023-03-01\", \"section_id\": \"D01-S3\", \"section_title\": \"报销材料\", \"snippet\": \"报销须提供合规的纸质发票或电子发票，以及费用明细单。单笔金额超过 5000 元的，须附事前审批单。\", \"score\": 2.132, \"coverage\": 0.206, \"matched_terms\": [\"报销\"]}, {\"doc_id\": \"D02\", \"title\": \"费用报销操作指引\", \"version_date\": \"2024-05-20\", \"section_id\": \"D02-S2\", \"section_title\": \"电子发票\", \"snippet\": \"电子发票须上传 PDF 或 OFD 格式的原文件，截图无效。同一张发票不得重复报销。\", \"score\": 1.933, \"coverage\": 0.206, \"matched_terms\": [\"报销\"]}, {\"doc_id\": \"D01\", \"title\": \"费用报销管理办法\", \"version_date\": \"2023-03-01\", \"section_id\": \"D01-S4\", \"section_title\": \"审批与付款\", \"snippet\": \"报销申请依次由直属上级、部门负责人和财务部审核。财务部在审核通过后 7 个工作日内完成付款。\", \"score\": 1.776, \"coverage\": 0.206, \"matched_terms\": [\"报销\"]}], \"steps_left\": 7}"
+            },
+            {
+              "role": "tool",
+              "tool_call_id": "call_01_lAA5cyCSYoTVD8On8FCx9187",
+              "content": "{\"ok\": true, \"query\": \"费用报销 提交时间 规定\", \"result_count\": 5, \"results\": [{\"doc_id\": \"D02\", \"title\": \"费用报销操作指引\", \"version_date\": \"2024-05-20\", \"section_id\": \"D02-S1\", \"section_title\": \"报销提交期限\", \"snippet\": \"费用报销须在费用发生后 15 天内提交，逾期后系统将关闭该笔费用的报销入口。\", \"score\": 8.455, \"coverage\": 0.343, \"matched_terms\": [\"费用\", \"用报\", \"报销\", \"提交\"]}, {\"doc_id\": \"D01\", \"title\": \"费用报销管理办法\", \"version_date\": \"2023-03-01\", \"section_id\": \"D01-S2\", \"section_title\": \"报销期限\", \"snippet\": \"员工应在费用发生之日起 30 天内通过 OA 系统提交报销申请。超过期限的，须附部门负责人签字的情况说明。\", \"score\": 6.261, \"coverage\": 0.343, \"matched_terms\": [\"费用\", \"用报\", \"报销\", \"提交\"]}, {\"doc_id\": \"D01\", \"title\": \"费用报销管理办法\", \"version_date\": \"2023-03-01\", \"section_id\": \"D01-S1\", \"section_title\": \"适用范围\", \"snippet\": \"本办法适用于公司全体正式员工因公发生的日常费用报销，包括市内交通费、业务招待费和办公用品费。\", \"score\": 5.251, \"coverage\": 0.257, \"matched_terms\": [\"费用\", \"用报\", \"报销\"]}, {\"doc_id\": \"D01\", \"title\": \"费用报销管理办法\", \"version_date\": \"2023-03-01\", \"section_id\": \"D01-S3\", \"section_title\": \"报销材料\", \"snippet\": \"报销须提供合规的纸质发票或电子发票，以及费用明细单。单笔金额超过 5000 元的，须附事前审批单。\", \"score\": 5.207, \"coverage\": 0.257, \"matched_terms\": [\"费用\", \"用报\", \"报销\"]}, {\"doc_id\": \"D02\", \"title\": \"费用报销操作指引\", \"version_date\": \"2024-05-20\", \"section_id\": \"D02-S2\", \"section_title\": \"电子发票\", \"snippet\": \"电子发票须上传 PDF 或 OFD 格式的原文件，截图无效。同一张发票不得重复报销。\", \"score\": 4.679, \"coverage\": 0.257, \"matched_terms\": [\"费用\", \"用报\", \"报销\"]}], \"steps_left\": 7}"
+            },
+            {
+              "role": "assistant",
+              "content": "两份文档的规定不一致（30 天与 15 天），我需要读取原文，查看是否有适用范围或优先级条款。",
+              "tool_calls": [
+                {
+                  "id": "call_00_LydbGInjA13cSt9l0CPY7882",
+                  "type": "function",
+                  "function": {
+                    "name": "read_doc",
+                    "arguments": "{\"doc_id\": \"D01\", \"reason\": \"读取《费用报销管理办法》全文，确认报销期限规定及适用范围、优先级条款\"}"
+                  }
+                },
+                {
+                  "id": "call_01_IKDUCHDK0Ceu7jKdjhqL1557",
+                  "type": "function",
+                  "function": {
+                    "name": "read_doc",
+                    "arguments": "{\"doc_id\": \"D02\", \"reason\": \"读取《费用报销操作指引》全文，确认报销期限规定及适用范围、替代关系条款\"}"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "tool",
+              "tool_call_id": "call_00_LydbGInjA13cSt9l0CPY7882",
+              "content": "{\"ok\": true, \"doc_id\": \"D01\", \"title\": \"费用报销管理办法\", \"version_date\": \"2023-03-01\", \"owner\": \"财务部\", \"sections\": [{\"section_id\": \"D01-S1\", \"title\": \"适用范围\", \"text\": \"本办法适用于公司全体正式员工因公发生的日常费用报销，包括市内交通费、业务招待费和办公用品费。\"}, {\"section_id\": \"D01-S2\", \"title\": \"报销期限\", \"text\": \"员工应在费用发生之日起 30 天内通过 OA 系统提交报销申请。超过期限的，须附部门负责人签字的情况说明。\"}, {\"section_id\": \"D01-S3\", \"title\": \"报销材料\", \"text\": \"报销须提供合规的纸质发票或电子发票，以及费用明细单。单笔金额超过 5000 元的，须附事前审批单。\"}, {\"section_id\": \"D01-S4\", \"title\": \"审批与付款\", \"text\": \"报销申请依次由直属上级、部门负责人和财务部审核。财务部在审核通过后 7 个工作日内完成付款。\"}], \"steps_left\": 6}"
+            },
+            {
+              "role": "tool",
+              "tool_call_id": "call_01_IKDUCHDK0Ceu7jKdjhqL1557",
+              "content": "{\"ok\": true, \"doc_id\": \"D02\", \"title\": \"费用报销操作指引\", \"version_date\": \"2024-05-20\", \"owner\": \"财务共享中心\", \"sections\": [{\"section_id\": \"D02-S1\", \"title\": \"报销提交期限\", \"text\": \"费用报销须在费用发生后 15 天内提交，逾期后系统将关闭该笔费用的报销入口。\"}, {\"section_id\": \"D02-S2\", \"title\": \"电子发票\", \"text\": \"电子发票须上传 PDF 或 OFD 格式的原文件，截图无效。同一张发票不得重复报销。\"}], \"steps_left\": 6}"
+            },
+            {
+              "role": "assistant",
+              "content": "两份文档对报销期限的规定不一致，且都没有写明适用范围或替代关系，需要用户确认。",
+              "tool_calls": [
+                {
+                  "id": "call_00_5MvPBmUnQOjccaoSICS16787",
+                  "type": "function",
+                  "function": {
+                    "name": "finish",
+                    "arguments": "{\"status\": \"conflict_needs_confirmation\", \"answer\": \"知识库中两份文档对报销期限的规定不一致，且均未写明适用范围或替代关系，需要您确认适用哪一份：\\n\\n1. 《费用报销管理办法》（D01，版本日期 2023-03-01，财务部）：员工应在费用发生之日起 30 天内通过 OA 系统提交报销申请；超过期限的，须附部门负责人签字的情况说明。\\n2. 《费用报销操作指引》（D02，版本日期 2024-05-20，财务共享中心）：费用报销须在费用发生后 15 天内提交，逾期后系统将关闭该笔费用的报销入口。\\n\\n两份文档的期限（30 天 / 15 天）和逾期后果（附情况说明 / 系统关闭入口）都不同，原文没有说明哪份优先或各自适用于什么情形，因此不能自行选定一个答案。\", \"citations\": [{\"doc_id\": \"D01\", \"quote\": \"员工应在费用发生之日起 30 天内通过 OA 系统提交报销申请。超过期限的，须附部门负责人签字的情况说明。\"}, {\"doc_id\": \"D02\", \"quote\": \"费用报销须在费用发生后 15 天内提交，逾期后系统将关闭该笔费用的报销入口。\"}], \"gaps\": [\"两份文档均未写明适用范围、生效或替代关系，无法判断哪一份适用于当前报销场景\"], \"clarification_question\": \"请确认您要适用哪份文档的规定：① D01《费用报销管理办法》（2023-03-01，30 天内提交，逾期须附部门负责人签字的情况说明）；② D02《费用报销操作指引》（2024-05-20，15 天内提交，逾期系统关闭报销入口）。\", \"reason\": \"两份文档对报销期限规定不一致且原文未写明适用范围或优先级，按规则需请用户确认适用哪份。\"}"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "tool",
+              "tool_call_id": "call_00_5MvPBmUnQOjccaoSICS16787",
+              "content": "{\"ok\": true, \"accepted\": true, \"steps_left\": 5}"
+            }
+          ],
+          "error": ""
+        }
+      }
+    ]
+  }
+]

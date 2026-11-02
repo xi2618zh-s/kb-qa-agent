@@ -1,0 +1,311 @@
+[
+  {
+    "case_id": "C15_ambiguous_reference",
+    "acceptance": [
+      "信息或资料不足",
+      "追问"
+    ],
+    "description": "“这个”没有可指代的对象，也没有对话历史，应追问具体事项，不能猜测后作答。",
+    "provider": "openai",
+    "model": "deepseek-chat",
+    "options": {},
+    "generated_at": "2026-11-02T23:25:34+08:00",
+    "passed": true,
+    "turns": [
+      {
+        "question": "这个能报销吗？",
+        "history_in": [],
+        "expect": {
+          "status": [
+            "need_clarification"
+          ]
+        },
+        "expect_source": "expect",
+        "checks": [
+          {
+            "name": "status",
+            "passed": true,
+            "detail": "实际 need_clarification，期望 ['need_clarification']"
+          }
+        ],
+        "passed": true,
+        "result": {
+          "status": "need_clarification",
+          "answer": "您的问题里没有说明具体是哪项费用或支出，我无法确定要查哪条报销规定。请补充说明费用类型（例如差旅交通、住宿、餐饮、办公用品、培训、通讯等）以及发生场景，我再为您查询对应的报销制度。",
+          "citations": [],
+          "gaps": [
+            "缺少待查询的具体费用项目或支出类型，无法定位适用的报销制度"
+          ],
+          "clarification_question": "请问您想报销的是哪一类费用？例如：差旅交通费、住宿费、餐饮招待费、办公用品采购、培训费用、通讯费等，请说明具体项目和发生场景。",
+          "stop_reason": "finished",
+          "steps_used": 1,
+          "tool_calls_used": 0,
+          "limits": {
+            "max_steps": 8,
+            "max_tool_calls": 12
+          },
+          "trace": [
+            {
+              "step": 1,
+              "action": "finish",
+              "arguments": {
+                "status": "need_clarification",
+                "answer": "您的问题里没有说明具体是哪项费用或支出，我无法确定要查哪条报销规定。请补充说明费用类型（例如差旅交通、住宿、餐饮、办公用品、培训、通讯等）以及发生场景，我再为您查询对应的报销制度。",
+                "citations": [],
+                "gaps": [
+                  "缺少待查询的具体费用项目或支出类型，无法定位适用的报销制度"
+                ],
+                "clarification_question": "请问您想报销的是哪一类费用？例如：差旅交通费、住宿费、餐饮招待费、办公用品采购、培训费用、通讯费等，请说明具体项目和发生场景。"
+              },
+              "reason": "问题中的“这个”没有可指代的对象，缺少必要条件，需先追问具体费用类型。",
+              "llm_ms": 2236,
+              "usage": {
+                "prompt_tokens": 1612,
+                "completion_tokens": 266
+              },
+              "ok": true,
+              "observation": "结果通过校验，本轮结束",
+              "next_action": "（结束）"
+            }
+          ],
+          "transcript": [
+            {
+              "role": "system",
+              "content": "你是企业内部知识库问答助手，帮助员工查询公司制度和产品 FAQ。你只能依据工具返回的知识库原文回答，不能使用常识或外部知识补全。\n\n工作方式：每一步调用一个工具，观察结果后决定下一步。可用工具：\n- search_docs：检索知识库。结果为空或与问题无关时，可以换成制度原文里可能出现的说法再检索。\n- read_doc：读取文档原文。引用前必须先读取原文；检索片段只用于定位。\n- finish：提交结构化结果并结束本轮。不要直接用文字回答，必须通过 finish 提交。\n\n决策规则：\n1. 检索后读取相关文档原文，再作答。可能相关的文档都要读，以便发现规定不一致。\n2. 多份文档对同一事项规定不一致时，先在原文中查找适用范围、生效或替代关系等条款：\n   - 原文写明了适用范围或优先级：按原文分别说明，并引用这些条款，status=answered。\n   - 原文没有写明：status=conflict_needs_confirmation。在 answer 中列出每份文档的规定和版本日期，引用各自原文。不得因为版本日期较新或其他推测自行选定一个答案。\n   - 冲突时的 clarification_question 要给出可选项，逐一列出各文档的 ID 和标题，请用户选择适用哪份。只陈述原文中的规定，不得加入原文没有的推测（例如原文没提到的部门、费用类型或流程区分）。\n   - 同一事项按条件分档（如按工龄、城市分级）不是冲突，应按档位说明。\n3. 检索结果与问题无关时，最多换 2 次关键词；仍然完全找不到依据就 status=insufficient_evidence，在 gaps 中说明缺少什么资料，此时不附引用。\n   知识库只能回答问题的一部分时，用 status=answered：回答能回答的部分并引用，把缺失的部分写进 gaps。\n4. 工具返回 TOOL_UNAVAILABLE 时可以重试；同一工具连续 2 次不可用就不要再试，直接 status=tool_error，说明哪些资料未能获取，不得编造。\n5. 问题缺少必要条件、无法确定要查什么时（例如“这个”“那笔”没有可指代的对象），status=need_clarification，并在 clarification_question 中追问。\n6. 结合对话历史理解追问（如“那……呢”）。用户在历史中已确认适用哪份制度的，按用户确认的制度回答，并在 answer 中说明依据的是用户确认。\n7. citations 的 quote 必须逐字摘自 read_doc 返回的原文，可以截取片段，但不能改写、拼接或加省略号。answer 中出现的数字必须能在引用原文或用户问题中找到。\n   citations 只放回答中实际用到的原文（结论和补充都算），不要引用回答没用到的段落。不值得引用的补充就不要写。\n8. answer 的格式：第一句直接给出结论；随后说明依据（文档和版本日期）；与问题没有直接关系的补充最多一条。\n9. 每次调用工具都在 reason 参数中用一句话说明为什么选择这一步。\n10. 本轮最多 8 步，每次工具结果会告诉你剩余步数。快用完时，用已有信息调用 finish。"
+            },
+            {
+              "role": "user",
+              "content": "当前问题：这个能报销吗？"
+            },
+            {
+              "role": "assistant",
+              "content": "我需要先确认您指的是哪项费用，才能查询对应的报销制度。",
+              "tool_calls": [
+                {
+                  "id": "call_00_Y1J5U3TfH3JyOPNxDKwl4518",
+                  "type": "function",
+                  "function": {
+                    "name": "finish",
+                    "arguments": "{\"status\": \"need_clarification\", \"answer\": \"您的问题里没有说明具体是哪项费用或支出，我无法确定要查哪条报销规定。请补充说明费用类型（例如差旅交通、住宿、餐饮、办公用品、培训、通讯等）以及发生场景，我再为您查询对应的报销制度。\", \"citations\": [], \"gaps\": [\"缺少待查询的具体费用项目或支出类型，无法定位适用的报销制度\"], \"clarification_question\": \"请问您想报销的是哪一类费用？例如：差旅交通费、住宿费、餐饮招待费、办公用品采购、培训费用、通讯费等，请说明具体项目和发生场景。\", \"reason\": \"问题中的“这个”没有可指代的对象，缺少必要条件，需先追问具体费用类型。\"}"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "tool",
+              "tool_call_id": "call_00_Y1J5U3TfH3JyOPNxDKwl4518",
+              "content": "{\"ok\": true, \"accepted\": true, \"steps_left\": 7}"
+            }
+          ],
+          "error": ""
+        }
+      }
+    ]
+  },
+  {
+    "case_id": "C15_ambiguous_reference",
+    "acceptance": [
+      "信息或资料不足",
+      "追问"
+    ],
+    "description": "“这个”没有可指代的对象，也没有对话历史，应追问具体事项，不能猜测后作答。",
+    "provider": "openai",
+    "model": "deepseek-chat",
+    "options": {},
+    "generated_at": "2026-11-02T23:25:36+08:00",
+    "passed": true,
+    "turns": [
+      {
+        "question": "这个能报销吗？",
+        "history_in": [],
+        "expect": {
+          "status": [
+            "need_clarification"
+          ]
+        },
+        "expect_source": "expect",
+        "checks": [
+          {
+            "name": "status",
+            "passed": true,
+            "detail": "实际 need_clarification，期望 ['need_clarification']"
+          }
+        ],
+        "passed": true,
+        "result": {
+          "status": "need_clarification",
+          "answer": "您的问题里没有说明具体是哪项费用或支出，我无法确定要查哪条报销规定。请补充说明费用类型（例如差旅交通、餐饮招待、办公用品、培训等）以及发生场景，我再为您检索对应的报销制度。",
+          "citations": [],
+          "gaps": [
+            "缺少待查询的具体费用项目或支出类型，无法定位适用的报销制度"
+          ],
+          "clarification_question": "请问您要报销的是哪一类费用？例如：差旅交通费、餐饮/招待费、办公用品采购、培训费用，或其他（请说明具体项目和发生场景）。",
+          "stop_reason": "finished",
+          "steps_used": 1,
+          "tool_calls_used": 0,
+          "limits": {
+            "max_steps": 8,
+            "max_tool_calls": 12
+          },
+          "trace": [
+            {
+              "step": 1,
+              "action": "finish",
+              "arguments": {
+                "status": "need_clarification",
+                "answer": "您的问题里没有说明具体是哪项费用或支出，我无法确定要查哪条报销规定。请补充说明费用类型（例如差旅交通、餐饮招待、办公用品、培训等）以及发生场景，我再为您检索对应的报销制度。",
+                "citations": [],
+                "gaps": [
+                  "缺少待查询的具体费用项目或支出类型，无法定位适用的报销制度"
+                ],
+                "clarification_question": "请问您要报销的是哪一类费用？例如：差旅交通费、餐饮/招待费、办公用品采购、培训费用，或其他（请说明具体项目和发生场景）。"
+              },
+              "reason": "问题中的“这个”没有可指代的对象，缺少必要条件，需先追问具体费用类型。",
+              "llm_ms": 1889,
+              "usage": {
+                "prompt_tokens": 1612,
+                "completion_tokens": 261
+              },
+              "ok": true,
+              "observation": "结果通过校验，本轮结束",
+              "next_action": "（结束）"
+            }
+          ],
+          "transcript": [
+            {
+              "role": "system",
+              "content": "你是企业内部知识库问答助手，帮助员工查询公司制度和产品 FAQ。你只能依据工具返回的知识库原文回答，不能使用常识或外部知识补全。\n\n工作方式：每一步调用一个工具，观察结果后决定下一步。可用工具：\n- search_docs：检索知识库。结果为空或与问题无关时，可以换成制度原文里可能出现的说法再检索。\n- read_doc：读取文档原文。引用前必须先读取原文；检索片段只用于定位。\n- finish：提交结构化结果并结束本轮。不要直接用文字回答，必须通过 finish 提交。\n\n决策规则：\n1. 检索后读取相关文档原文，再作答。可能相关的文档都要读，以便发现规定不一致。\n2. 多份文档对同一事项规定不一致时，先在原文中查找适用范围、生效或替代关系等条款：\n   - 原文写明了适用范围或优先级：按原文分别说明，并引用这些条款，status=answered。\n   - 原文没有写明：status=conflict_needs_confirmation。在 answer 中列出每份文档的规定和版本日期，引用各自原文。不得因为版本日期较新或其他推测自行选定一个答案。\n   - 冲突时的 clarification_question 要给出可选项，逐一列出各文档的 ID 和标题，请用户选择适用哪份。只陈述原文中的规定，不得加入原文没有的推测（例如原文没提到的部门、费用类型或流程区分）。\n   - 同一事项按条件分档（如按工龄、城市分级）不是冲突，应按档位说明。\n3. 检索结果与问题无关时，最多换 2 次关键词；仍然完全找不到依据就 status=insufficient_evidence，在 gaps 中说明缺少什么资料，此时不附引用。\n   知识库只能回答问题的一部分时，用 status=answered：回答能回答的部分并引用，把缺失的部分写进 gaps。\n4. 工具返回 TOOL_UNAVAILABLE 时可以重试；同一工具连续 2 次不可用就不要再试，直接 status=tool_error，说明哪些资料未能获取，不得编造。\n5. 问题缺少必要条件、无法确定要查什么时（例如“这个”“那笔”没有可指代的对象），status=need_clarification，并在 clarification_question 中追问。\n6. 结合对话历史理解追问（如“那……呢”）。用户在历史中已确认适用哪份制度的，按用户确认的制度回答，并在 answer 中说明依据的是用户确认。\n7. citations 的 quote 必须逐字摘自 read_doc 返回的原文，可以截取片段，但不能改写、拼接或加省略号。answer 中出现的数字必须能在引用原文或用户问题中找到。\n   citations 只放回答中实际用到的原文（结论和补充都算），不要引用回答没用到的段落。不值得引用的补充就不要写。\n8. answer 的格式：第一句直接给出结论；随后说明依据（文档和版本日期）；与问题没有直接关系的补充最多一条。\n9. 每次调用工具都在 reason 参数中用一句话说明为什么选择这一步。\n10. 本轮最多 8 步，每次工具结果会告诉你剩余步数。快用完时，用已有信息调用 finish。"
+            },
+            {
+              "role": "user",
+              "content": "当前问题：这个能报销吗？"
+            },
+            {
+              "role": "assistant",
+              "content": "我需要先确认您指的是哪项费用，才能查询对应的报销制度。",
+              "tool_calls": [
+                {
+                  "id": "call_00_PDXfJOmgUJeXE4BNF89W2724",
+                  "type": "function",
+                  "function": {
+                    "name": "finish",
+                    "arguments": "{\"status\": \"need_clarification\", \"answer\": \"您的问题里没有说明具体是哪项费用或支出，我无法确定要查哪条报销规定。请补充说明费用类型（例如差旅交通、餐饮招待、办公用品、培训等）以及发生场景，我再为您检索对应的报销制度。\", \"citations\": [], \"gaps\": [\"缺少待查询的具体费用项目或支出类型，无法定位适用的报销制度\"], \"reason\": \"问题中的“这个”没有可指代的对象，缺少必要条件，需先追问具体费用类型。\", \"clarification_question\": \"请问您要报销的是哪一类费用？例如：差旅交通费、餐饮/招待费、办公用品采购、培训费用，或其他（请说明具体项目和发生场景）。\"}"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "tool",
+              "tool_call_id": "call_00_PDXfJOmgUJeXE4BNF89W2724",
+              "content": "{\"ok\": true, \"accepted\": true, \"steps_left\": 7}"
+            }
+          ],
+          "error": ""
+        }
+      }
+    ]
+  },
+  {
+    "case_id": "C15_ambiguous_reference",
+    "acceptance": [
+      "信息或资料不足",
+      "追问"
+    ],
+    "description": "“这个”没有可指代的对象，也没有对话历史，应追问具体事项，不能猜测后作答。",
+    "provider": "openai",
+    "model": "deepseek-chat",
+    "options": {},
+    "generated_at": "2026-11-02T23:25:38+08:00",
+    "passed": true,
+    "turns": [
+      {
+        "question": "这个能报销吗？",
+        "history_in": [],
+        "expect": {
+          "status": [
+            "need_clarification"
+          ]
+        },
+        "expect_source": "expect",
+        "checks": [
+          {
+            "name": "status",
+            "passed": true,
+            "detail": "实际 need_clarification，期望 ['need_clarification']"
+          }
+        ],
+        "passed": true,
+        "result": {
+          "status": "need_clarification",
+          "answer": "您的问题里没有说明具体是哪项费用或事项（“这个”没有可指代的对象），我无法确定要查哪条报销规定。请补充具体费用类型或事项，我再为您检索制度原文。",
+          "citations": [],
+          "gaps": [
+            "缺少待查询的具体费用项目或事项描述"
+          ],
+          "clarification_question": "请问您想报销的具体是什么费用或事项？例如：差旅交通费、住宿费、餐饮招待费、办公用品、培训费、通讯费等，请说明具体项目（如有金额、城市、出差或加班等情形也请一并说明）。",
+          "stop_reason": "finished",
+          "steps_used": 1,
+          "tool_calls_used": 0,
+          "limits": {
+            "max_steps": 8,
+            "max_tool_calls": 12
+          },
+          "trace": [
+            {
+              "step": 1,
+              "action": "finish",
+              "arguments": {
+                "status": "need_clarification",
+                "answer": "您的问题里没有说明具体是哪项费用或事项（“这个”没有可指代的对象），我无法确定要查哪条报销规定。请补充具体费用类型或事项，我再为您检索制度原文。",
+                "citations": [],
+                "gaps": [
+                  "缺少待查询的具体费用项目或事项描述"
+                ],
+                "clarification_question": "请问您想报销的具体是什么费用或事项？例如：差旅交通费、住宿费、餐饮招待费、办公用品、培训费、通讯费等，请说明具体项目（如有金额、城市、出差或加班等情形也请一并说明）。"
+              },
+              "reason": "问题中的“这个”没有可指代对象，缺少必要条件，无法确定检索哪项报销制度。",
+              "llm_ms": 2178,
+              "usage": {
+                "prompt_tokens": 1612,
+                "completion_tokens": 264
+              },
+              "ok": true,
+              "observation": "结果通过校验，本轮结束",
+              "next_action": "（结束）"
+            }
+          ],
+          "transcript": [
+            {
+              "role": "system",
+              "content": "你是企业内部知识库问答助手，帮助员工查询公司制度和产品 FAQ。你只能依据工具返回的知识库原文回答，不能使用常识或外部知识补全。\n\n工作方式：每一步调用一个工具，观察结果后决定下一步。可用工具：\n- search_docs：检索知识库。结果为空或与问题无关时，可以换成制度原文里可能出现的说法再检索。\n- read_doc：读取文档原文。引用前必须先读取原文；检索片段只用于定位。\n- finish：提交结构化结果并结束本轮。不要直接用文字回答，必须通过 finish 提交。\n\n决策规则：\n1. 检索后读取相关文档原文，再作答。可能相关的文档都要读，以便发现规定不一致。\n2. 多份文档对同一事项规定不一致时，先在原文中查找适用范围、生效或替代关系等条款：\n   - 原文写明了适用范围或优先级：按原文分别说明，并引用这些条款，status=answered。\n   - 原文没有写明：status=conflict_needs_confirmation。在 answer 中列出每份文档的规定和版本日期，引用各自原文。不得因为版本日期较新或其他推测自行选定一个答案。\n   - 冲突时的 clarification_question 要给出可选项，逐一列出各文档的 ID 和标题，请用户选择适用哪份。只陈述原文中的规定，不得加入原文没有的推测（例如原文没提到的部门、费用类型或流程区分）。\n   - 同一事项按条件分档（如按工龄、城市分级）不是冲突，应按档位说明。\n3. 检索结果与问题无关时，最多换 2 次关键词；仍然完全找不到依据就 status=insufficient_evidence，在 gaps 中说明缺少什么资料，此时不附引用。\n   知识库只能回答问题的一部分时，用 status=answered：回答能回答的部分并引用，把缺失的部分写进 gaps。\n4. 工具返回 TOOL_UNAVAILABLE 时可以重试；同一工具连续 2 次不可用就不要再试，直接 status=tool_error，说明哪些资料未能获取，不得编造。\n5. 问题缺少必要条件、无法确定要查什么时（例如“这个”“那笔”没有可指代的对象），status=need_clarification，并在 clarification_question 中追问。\n6. 结合对话历史理解追问（如“那……呢”）。用户在历史中已确认适用哪份制度的，按用户确认的制度回答，并在 answer 中说明依据的是用户确认。\n7. citations 的 quote 必须逐字摘自 read_doc 返回的原文，可以截取片段，但不能改写、拼接或加省略号。answer 中出现的数字必须能在引用原文或用户问题中找到。\n   citations 只放回答中实际用到的原文（结论和补充都算），不要引用回答没用到的段落。不值得引用的补充就不要写。\n8. answer 的格式：第一句直接给出结论；随后说明依据（文档和版本日期）；与问题没有直接关系的补充最多一条。\n9. 每次调用工具都在 reason 参数中用一句话说明为什么选择这一步。\n10. 本轮最多 8 步，每次工具结果会告诉你剩余步数。快用完时，用已有信息调用 finish。"
+            },
+            {
+              "role": "user",
+              "content": "当前问题：这个能报销吗？"
+            },
+            {
+              "role": "assistant",
+              "content": "我需要先确认您指的是哪项费用，才能查询对应的报销制度。",
+              "tool_calls": [
+                {
+                  "id": "call_00_ZHyuiY2NwSuu0gXau0NH7280",
+                  "type": "function",
+                  "function": {
+                    "name": "finish",
+                    "arguments": "{\"status\": \"need_clarification\", \"answer\": \"您的问题里没有说明具体是哪项费用或事项（“这个”没有可指代的对象），我无法确定要查哪条报销规定。请补充具体费用类型或事项，我再为您检索制度原文。\", \"citations\": [], \"gaps\": [\"缺少待查询的具体费用项目或事项描述\"], \"clarification_question\": \"请问您想报销的具体是什么费用或事项？例如：差旅交通费、住宿费、餐饮招待费、办公用品、培训费、通讯费等，请说明具体项目（如有金额、城市、出差或加班等情形也请一并说明）。\", \"reason\": \"问题中的“这个”没有可指代对象，缺少必要条件，无法确定检索哪项报销制度。\"}"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "tool",
+              "tool_call_id": "call_00_ZHyuiY2NwSuu0gXau0NH7280",
+              "content": "{\"ok\": true, \"accepted\": true, \"steps_left\": 7}"
+            }
+          ],
+          "error": ""
+        }
+      }
+    ]
+  }
+]

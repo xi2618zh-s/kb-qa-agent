@@ -1,0 +1,179 @@
+{
+  "case_id": "C09_tool_failure_persistent",
+  "acceptance": [
+    "工具失败"
+  ],
+  "description": "知识库全部工具持续不可用，应返回 tool_error 和资料缺口，不得编造答案。",
+  "provider": "mock",
+  "model": "heuristic-policy",
+  "options": {
+    "fail": [
+      "*:always"
+    ]
+  },
+  "generated_at": "2026-11-02T23:20:11+08:00",
+  "passed": true,
+  "turns": [
+    {
+      "question": "云笺笔记的离线模式哪个版本能用？",
+      "history_in": [],
+      "expect": {
+        "status": [
+          "tool_error"
+        ],
+        "gaps_nonempty": true,
+        "no_citations": true
+      },
+      "expect_source": "expect",
+      "checks": [
+        {
+          "name": "status",
+          "passed": true,
+          "detail": "实际 tool_error，期望 ['tool_error']"
+        },
+        {
+          "name": "资料缺口非空",
+          "passed": true,
+          "detail": "1 条"
+        },
+        {
+          "name": "无引用",
+          "passed": true,
+          "detail": "实际引用 []"
+        }
+      ],
+      "passed": true,
+      "result": {
+        "status": "tool_error",
+        "answer": "知识库工具连续失败，暂时无法查询，本轮不给出答案。",
+        "citations": [],
+        "gaps": [
+          "search_docs 连续 2 次不可用，未能获取相关制度原文"
+        ],
+        "clarification_question": "",
+        "stop_reason": "finished",
+        "steps_used": 3,
+        "tool_calls_used": 2,
+        "limits": {
+          "max_steps": 8,
+          "max_tool_calls": 12
+        },
+        "trace": [
+          {
+            "step": 1,
+            "action": "search_docs",
+            "arguments": {
+              "query": "云笺笔记的离线模式哪个版本能用？"
+            },
+            "reason": "先检索与问题相关的制度段落",
+            "llm_ms": 0,
+            "usage": {},
+            "ok": false,
+            "observation": "失败 TOOL_UNAVAILABLE：模拟故障（注入）：search_docs 服务暂时不可用",
+            "next_action": "search_docs"
+          },
+          {
+            "step": 2,
+            "action": "search_docs",
+            "arguments": {
+              "query": "云笺笔记的离线模式哪个版本能用？"
+            },
+            "reason": "search_docs 返回临时故障，重试一次",
+            "llm_ms": 0,
+            "usage": {},
+            "ok": false,
+            "observation": "失败 TOOL_UNAVAILABLE：模拟故障（注入）：search_docs 服务暂时不可用",
+            "next_action": "finish"
+          },
+          {
+            "step": 3,
+            "action": "finish",
+            "arguments": {
+              "status": "tool_error",
+              "answer": "知识库工具连续失败，暂时无法查询，本轮不给出答案。",
+              "citations": [],
+              "gaps": [
+                "search_docs 连续 2 次不可用，未能获取相关制度原文"
+              ],
+              "clarification_question": ""
+            },
+            "reason": "search_docs 连续 2 次失败，停止重试",
+            "llm_ms": 0,
+            "usage": {},
+            "ok": true,
+            "observation": "结果通过校验，本轮结束",
+            "next_action": "（结束）"
+          }
+        ],
+        "transcript": [
+          {
+            "role": "system",
+            "content": "你是企业内部知识库问答助手，帮助员工查询公司制度和产品 FAQ。你只能依据工具返回的知识库原文回答，不能使用常识或外部知识补全。\n\n工作方式：每一步调用一个工具，观察结果后决定下一步。可用工具：\n- search_docs：检索知识库。结果为空或与问题无关时，可以换成制度原文里可能出现的说法再检索。\n- read_doc：读取文档原文。引用前必须先读取原文；检索片段只用于定位。\n- finish：提交结构化结果并结束本轮。不要直接用文字回答，必须通过 finish 提交。\n\n决策规则：\n1. 检索后读取相关文档原文，再作答。可能相关的文档都要读，以便发现规定不一致。\n2. 多份文档对同一事项规定不一致时，先在原文中查找适用范围、生效或替代关系等条款：\n   - 原文写明了适用范围或优先级：按原文分别说明，并引用这些条款，status=answered。\n   - 原文没有写明：status=conflict_needs_confirmation。在 answer 中列出每份文档的规定和版本日期，引用各自原文。不得因为版本日期较新或其他推测自行选定一个答案。\n   - 冲突时的 clarification_question 要给出可选项，逐一列出各文档的 ID 和标题，请用户选择适用哪份。只陈述原文中的规定，不得加入原文没有的推测（例如原文没提到的部门、费用类型或流程区分）。\n   - 同一事项按条件分档（如按工龄、城市分级）不是冲突，应按档位说明。\n3. 检索结果与问题无关时，最多换 2 次关键词；仍然完全找不到依据就 status=insufficient_evidence，在 gaps 中说明缺少什么资料，此时不附引用。\n   知识库只能回答问题的一部分时，用 status=answered：回答能回答的部分并引用，把缺失的部分写进 gaps。\n4. 工具返回 TOOL_UNAVAILABLE 时可以重试；同一工具连续 2 次不可用就不要再试，直接 status=tool_error，说明哪些资料未能获取，不得编造。\n5. 问题缺少必要条件、无法确定要查什么时（例如“这个”“那笔”没有可指代的对象），status=need_clarification，并在 clarification_question 中追问。\n6. 结合对话历史理解追问（如“那……呢”）。用户在历史中已确认适用哪份制度的，按用户确认的制度回答，并在 answer 中说明依据的是用户确认。\n7. citations 的 quote 必须逐字摘自 read_doc 返回的原文，可以截取片段，但不能改写、拼接或加省略号。answer 中出现的数字必须能在引用原文或用户问题中找到。\n   citations 只放回答中实际用到的原文（结论和补充都算），不要引用回答没用到的段落。不值得引用的补充就不要写。\n8. answer 的格式：第一句直接给出结论；随后说明依据（文档和版本日期）；与问题没有直接关系的补充最多一条。\n9. 每次调用工具都在 reason 参数中用一句话说明为什么选择这一步。\n10. 本轮最多 8 步，每次工具结果会告诉你剩余步数。快用完时，用已有信息调用 finish。"
+          },
+          {
+            "role": "user",
+            "content": "当前问题：云笺笔记的离线模式哪个版本能用？"
+          },
+          {
+            "role": "assistant",
+            "content": "",
+            "tool_calls": [
+              {
+                "id": "mock-34",
+                "type": "function",
+                "function": {
+                  "name": "search_docs",
+                  "arguments": "{\"query\": \"云笺笔记的离线模式哪个版本能用？\", \"reason\": \"先检索与问题相关的制度段落\"}"
+                }
+              }
+            ]
+          },
+          {
+            "role": "tool",
+            "tool_call_id": "mock-34",
+            "content": "{\"ok\": false, \"error_code\": \"TOOL_UNAVAILABLE\", \"error\": \"模拟故障（注入）：search_docs 服务暂时不可用\", \"retryable\": true, \"steps_left\": 7}"
+          },
+          {
+            "role": "assistant",
+            "content": "",
+            "tool_calls": [
+              {
+                "id": "mock-35",
+                "type": "function",
+                "function": {
+                  "name": "search_docs",
+                  "arguments": "{\"query\": \"云笺笔记的离线模式哪个版本能用？\", \"reason\": \"search_docs 返回临时故障，重试一次\"}"
+                }
+              }
+            ]
+          },
+          {
+            "role": "tool",
+            "tool_call_id": "mock-35",
+            "content": "{\"ok\": false, \"error_code\": \"TOOL_UNAVAILABLE\", \"error\": \"模拟故障（注入）：search_docs 服务暂时不可用\", \"retryable\": true, \"steps_left\": 6}"
+          },
+          {
+            "role": "assistant",
+            "content": "",
+            "tool_calls": [
+              {
+                "id": "mock-36",
+                "type": "function",
+                "function": {
+                  "name": "finish",
+                  "arguments": "{\"status\": \"tool_error\", \"answer\": \"知识库工具连续失败，暂时无法查询，本轮不给出答案。\", \"citations\": [], \"gaps\": [\"search_docs 连续 2 次不可用，未能获取相关制度原文\"], \"clarification_question\": \"\", \"reason\": \"search_docs 连续 2 次失败，停止重试\"}"
+                }
+              }
+            ]
+          },
+          {
+            "role": "tool",
+            "tool_call_id": "mock-36",
+            "content": "{\"ok\": true, \"accepted\": true, \"steps_left\": 5}"
+          }
+        ],
+        "error": ""
+      }
+    }
+  ]
+}

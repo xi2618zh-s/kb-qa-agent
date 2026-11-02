@@ -1,0 +1,184 @@
+[
+  {
+    "id": "C01_clear_answer",
+    "acceptance": ["明确答案"],
+    "description": "单一文档能直接回答的制度问题。",
+    "turns": [
+      {
+        "question": "工作满 3 年的员工有几天年假？",
+        "expect": {"status": ["answered"], "cited_docs_include": ["D03"], "answer_contains_any": ["5"]}
+      }
+    ]
+  },
+  {
+    "id": "C02_paraphrase",
+    "acceptance": ["改写后的相似问题"],
+    "description": "与 C01 同义但措辞不同，答案和引用应与 C01 一致。",
+    "turns": [
+      {
+        "question": "参加工作满三年的话，每年的带薪年休假有多少天？",
+        "expect": {"status": ["answered"], "cited_docs_include": ["D03"], "answer_contains_any": ["5"]}
+      }
+    ]
+  },
+  {
+    "id": "C03_conflict",
+    "acceptance": ["文档冲突"],
+    "description": "题目参考实例：D01 写 30 天、D02 写 15 天，均未写适用范围和优先级。应列出冲突并请求确认，不能擅自回答 15 天。",
+    "turns": [
+      {
+        "question": "报销期限是多久？",
+        "expect": {"status": ["conflict_needs_confirmation"], "cited_docs_include": ["D01", "D02"], "answer_contains_all": ["30", "15"]}
+      }
+    ]
+  },
+  {
+    "id": "C04_conflict_then_user_confirms",
+    "acceptance": ["文档冲突", "上下文追问"],
+    "description": "第一轮报告冲突；第二轮用户确认适用 D02，Agent 结合历史按用户确认的制度回答。",
+    "turns": [
+      {
+        "question": "报销期限是多久？",
+        "expect": {"status": ["conflict_needs_confirmation"], "cited_docs_include": ["D01", "D02"]}
+      },
+      {
+        "question": "我们部门执行的是《费用报销操作指引》，那我的期限是多少天？",
+        "expect": {"status": ["answered"], "cited_docs_include": ["D02"], "answer_contains_any": ["15"]}
+      }
+    ]
+  },
+  {
+    "id": "C05_context_followup",
+    "acceptance": ["上下文追问"],
+    "description": "第二轮的“那……呢”需要结合上一轮才能理解。",
+    "turns": [
+      {
+        "question": "工作满 3 年的员工有几天年假？",
+        "expect": {"status": ["answered"], "cited_docs_include": ["D03"]}
+      },
+      {
+        "question": "那刚毕业、之前没上过班的新员工呢？",
+        "expect": {"status": ["answered"], "cited_docs_include": ["D03"], "answer_contains_any": ["不享受", "没有", "无"]}
+      }
+    ]
+  },
+  {
+    "id": "C06_out_of_scope",
+    "acceptance": ["资料外问题", "信息或资料不足"],
+    "description": "知识库没有股票期权相关制度，应说明资料缺口，不得凭常识回答。",
+    "turns": [
+      {
+        "question": "公司的股票期权怎么行权？",
+        "expect": {"status": ["insufficient_evidence"], "gaps_nonempty": true}
+      }
+    ]
+  },
+  {
+    "id": "C07_query_rewrite",
+    "acceptance": ["改写后的相似问题", "检索改进"],
+    "description": "用户用缩写 WFH，知识库写的是“远程办公”，字面检索找不到，需要模型改写查询后找到 D05 并引用其中的 VPN 条款。知识库只写了远程办公要开通 VPN、没写 WFH 本身是否要审批，属于部分可答。v1 没有部分可答的规则，模型在 answered 和 insufficient_evidence 之间摇摆；v2 规定部分可答用 answered、缺失部分写进 gaps，预期收紧为 answered（过程见 docs/03-evaluation.md）。离线 Mock 没有语义改写能力，预期返回资料不足。",
+    "turns": [
+      {
+        "question": "WFH 要先申请什么？",
+        "expect": {"status": ["answered"], "cited_docs_include": ["D05"], "answer_contains_any": ["VPN"]},
+        "expect_mock": {"status": ["insufficient_evidence"]}
+      }
+    ]
+  },
+  {
+    "id": "C08_tool_failure_transient",
+    "acceptance": ["工具失败"],
+    "description": "检索工具第一次调用失败。代码不自动重试，由模型观察错误后决定重试。",
+    "options": {"fail": ["search_docs:once"]},
+    "turns": [
+      {
+        "question": "云笺笔记的离线模式哪个版本能用？",
+        "expect": {"status": ["answered"], "cited_docs_include": ["D06"], "answer_contains_any": ["专业版"]}
+      }
+    ]
+  },
+  {
+    "id": "C09_tool_failure_persistent",
+    "acceptance": ["工具失败"],
+    "description": "知识库全部工具持续不可用，应返回 tool_error 和资料缺口，不得编造答案。",
+    "options": {"fail": ["*:always"]},
+    "turns": [
+      {
+        "question": "云笺笔记的离线模式哪个版本能用？",
+        "expect": {"status": ["tool_error"], "gaps_nonempty": true, "no_citations": true}
+      }
+    ]
+  },
+  {
+    "id": "C10_step_limit",
+    "acceptance": ["步数上限"],
+    "description": "把步数上限设为 2，冲突问题来不及查证，应返回明确的未完成状态。",
+    "options": {"max_steps": 2},
+    "turns": [
+      {
+        "question": "报销期限是多久？",
+        "expect": {"status": ["incomplete"], "stop_reason": "step_limit_reached"}
+      }
+    ]
+  },
+  {
+    "id": "C11_doc_removed_no_conflict",
+    "acceptance": ["明确答案", "替换文档"],
+    "description": "移除 D02 后只剩 D01，没有冲突，应依据 D01 回答 30 天（题目参考实例的第二种情况）。",
+    "options": {"exclude_docs": ["D02"]},
+    "turns": [
+      {
+        "question": "报销期限是多久？",
+        "expect": {"status": ["answered"], "cited_docs_include": ["D01"], "cited_docs_exclude": ["D02"], "answer_contains_any": ["30"]}
+      }
+    ]
+  },
+  {
+    "id": "C12_doc_scoped_resolves_conflict",
+    "acceptance": ["文档冲突", "替换文档"],
+    "description": "D02 换成写明“仅适用于市场部”的版本。读取原文后冲突有了依据，应分别说明两种期限。离线 Mock 读不懂适用范围，预期仍报冲突。",
+    "options": {"overlay_dir": "data/variants/d02_scoped"},
+    "turns": [
+      {
+        "question": "报销期限是多久？",
+        "expect": {"status": ["answered"], "cited_docs_include": ["D01", "D02"], "answer_contains_all": ["30", "15", "市场部"]},
+        "expect_mock": {"status": ["conflict_needs_confirmation"]}
+      }
+    ]
+  },
+  {
+    "id": "C13_tiered_not_conflict",
+    "acceptance": ["文档冲突", "明确答案"],
+    "description": "冲突的反例：D03 中年假按工龄分为 5/10/15 天，同一份文档里出现了不同数值，但这是分档，不是冲突。应按档位回答，或追问工龄，不能报冲突。",
+    "turns": [
+      {
+        "question": "年假有几天？",
+        "expect": {"status": ["answered", "need_clarification"], "cited_docs_exclude": ["D01", "D02"]}
+      }
+    ]
+  },
+  {
+    "id": "C14_superseded_version",
+    "acceptance": ["文档冲突", "替换文档"],
+    "description": "叠加 D08《费用报销管理办法（2024 修订）》，它写明废止 D01、与 D02 不一致时以 D08 为准，期限 20 天。D01、D02、D08 三个数值都不同，但原文写明了替代关系，应依据 D08 回答 20 天，不报冲突。离线 Mock 读不懂替代关系，预期仍报冲突。",
+    "options": {"overlay_dir": "data/variants/d08_supersedes"},
+    "turns": [
+      {
+        "question": "报销期限是多久？",
+        "expect": {"status": ["answered"], "cited_docs_include": ["D08"], "answer_contains_any": ["20"]},
+        "expect_mock": {"status": ["conflict_needs_confirmation"]}
+      }
+    ]
+  },
+  {
+    "id": "C15_ambiguous_reference",
+    "acceptance": ["信息或资料不足", "追问"],
+    "description": "“这个”没有可指代的对象，也没有对话历史，应追问具体事项，不能猜测后作答。",
+    "turns": [
+      {
+        "question": "这个能报销吗？",
+        "expect": {"status": ["need_clarification"]}
+      }
+    ]
+  }
+]

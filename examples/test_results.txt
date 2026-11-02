@@ -1,0 +1,57 @@
+============================= test session starts =============================
+platform win32 -- Python 3.9.10, pytest-8.4.2, pluggy-1.6.0 -- <repo>/.venv/Scripts/python.exe
+rootdir: <repo>
+configfile: pytest.ini
+testpaths: tests
+plugins: anyio-4.12.1
+collecting ... collected 47 items
+
+tests/test_adapter_and_cli.py::test_adapter_sends_tools_and_parses_tool_calls PASSED [  2%]
+tests/test_adapter_and_cli.py::test_adapter_reports_bad_json_and_api_errors PASSED [  4%]
+tests/test_adapter_and_cli.py::test_agent_runs_through_the_adapter PASSED [  6%]
+tests/test_adapter_and_cli.py::test_cli_ask_with_mock_outputs_json PASSED [  8%]
+tests/test_adapter_and_cli.py::test_cli_run_cases_writes_records PASSED  [ 10%]
+tests/test_adapter_and_cli.py::test_cli_repeat_writes_stability_summary PASSED [ 12%]
+tests/test_agent_loop.py::test_citation_must_come_from_text_that_was_read PASSED [ 14%]
+tests/test_agent_loop.py::test_reworded_quote_is_rejected PASSED         [ 17%]
+tests/test_agent_loop.py::test_numbers_in_answer_must_appear_in_citations_or_question PASSED [ 19%]
+tests/test_agent_loop.py::test_section_ids_and_list_markers_are_not_treated_as_facts PASSED [ 21%]
+tests/test_agent_loop.py::test_clause_refs_and_inline_list_markers_are_not_treated_as_facts PASSED [ 23%]
+tests/test_agent_loop.py::test_chinese_numerals_in_the_question_support_arabic_numbers PASSED [ 25%]
+tests/test_agent_loop.py::test_chinese_quantities_in_the_answer_are_checked_but_counts_are_not PASSED [ 27%]
+tests/test_agent_loop.py::test_derived_or_invented_numbers_are_still_rejected PASSED [ 29%]
+tests/test_agent_loop.py::test_conflict_status_requires_two_documents_and_a_question PASSED [ 31%]
+tests/test_agent_loop.py::test_insufficient_evidence_must_not_carry_citations PASSED [ 34%]
+tests/test_agent_loop.py::test_need_clarification_requires_a_question PASSED [ 36%]
+tests/test_agent_loop.py::test_step_limit_returns_explicit_incomplete_status PASSED [ 38%]
+tests/test_agent_loop.py::test_tool_call_budget_is_enforced PASSED       [ 40%]
+tests/test_agent_loop.py::test_tool_failure_is_returned_to_model_without_automatic_retry PASSED [ 42%]
+tests/test_agent_loop.py::test_text_reply_triggers_protocol_reminder PASSED [ 44%]
+tests/test_agent_loop.py::test_invalid_json_arguments_are_reported PASSED [ 46%]
+tests/test_agent_loop.py::test_history_reaches_the_model PASSED          [ 48%]
+tests/test_agent_loop.py::test_trace_records_reason_and_next_action PASSED [ 51%]
+tests/test_cases_offline.py::test_case_meets_its_expectations_with_mock[C01_clear_answer] PASSED [ 53%]
+tests/test_cases_offline.py::test_case_meets_its_expectations_with_mock[C02_paraphrase] PASSED [ 55%]
+tests/test_cases_offline.py::test_case_meets_its_expectations_with_mock[C03_conflict] PASSED [ 57%]
+tests/test_cases_offline.py::test_case_meets_its_expectations_with_mock[C04_conflict_then_user_confirms] PASSED [ 59%]
+tests/test_cases_offline.py::test_case_meets_its_expectations_with_mock[C05_context_followup] PASSED [ 61%]
+tests/test_cases_offline.py::test_case_meets_its_expectations_with_mock[C06_out_of_scope] PASSED [ 63%]
+tests/test_cases_offline.py::test_case_meets_its_expectations_with_mock[C07_query_rewrite] PASSED [ 65%]
+tests/test_cases_offline.py::test_case_meets_its_expectations_with_mock[C08_tool_failure_transient] PASSED [ 68%]
+tests/test_cases_offline.py::test_case_meets_its_expectations_with_mock[C09_tool_failure_persistent] PASSED [ 70%]
+tests/test_cases_offline.py::test_case_meets_its_expectations_with_mock[C10_step_limit] PASSED [ 72%]
+tests/test_cases_offline.py::test_case_meets_its_expectations_with_mock[C11_doc_removed_no_conflict] PASSED [ 74%]
+tests/test_cases_offline.py::test_case_meets_its_expectations_with_mock[C12_doc_scoped_resolves_conflict] PASSED [ 76%]
+tests/test_cases_offline.py::test_case_meets_its_expectations_with_mock[C13_tiered_not_conflict] PASSED [ 78%]
+tests/test_cases_offline.py::test_case_meets_its_expectations_with_mock[C14_superseded_version] PASSED [ 80%]
+tests/test_cases_offline.py::test_case_meets_its_expectations_with_mock[C15_ambiguous_reference] PASSED [ 82%]
+tests/test_cases_offline.py::test_cases_cover_every_acceptance_point PASSED [ 85%]
+tests/test_cases_offline.py::test_editing_a_document_changes_the_answer PASSED [ 87%]
+tests/test_docs_and_retrieval.py::test_documents_parse_metadata_and_sections PASSED [ 89%]
+tests/test_docs_and_retrieval.py::test_overlay_replaces_document_and_exclude_removes_it PASSED [ 91%]
+tests/test_docs_and_retrieval.py::test_malformed_document_is_rejected PASSED [ 93%]
+tests/test_docs_and_retrieval.py::test_tokenize_uses_chinese_bigrams_and_ascii_words PASSED [ 95%]
+tests/test_docs_and_retrieval.py::test_conflicting_documents_are_both_retrieved PASSED [ 97%]
+tests/test_docs_and_retrieval.py::test_unknown_terms_give_low_coverage_and_rewrite_recovers PASSED [100%]
+
+============================= 47 passed in 1.02s ==============================

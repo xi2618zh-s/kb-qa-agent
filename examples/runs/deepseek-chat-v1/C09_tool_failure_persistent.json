@@ -1,0 +1,286 @@
+{
+  "case_id": "C09_tool_failure_persistent",
+  "acceptance": [
+    "工具失败"
+  ],
+  "description": "知识库全部工具持续不可用，应返回 tool_error 和资料缺口，不得编造答案。",
+  "provider": "openai",
+  "model": "deepseek-chat",
+  "options": {
+    "fail": [
+      "*:always"
+    ]
+  },
+  "generated_at": "2026-11-02T17:12:22+08:00",
+  "passed": true,
+  "turns": [
+    {
+      "question": "云笺笔记的离线模式哪个版本能用？",
+      "history_in": [],
+      "expect": {
+        "status": [
+          "tool_error"
+        ],
+        "gaps_nonempty": true,
+        "no_citations": true
+      },
+      "expect_source": "expect",
+      "checks": [
+        {
+          "name": "status",
+          "passed": true,
+          "detail": "实际 tool_error，期望 ['tool_error']"
+        },
+        {
+          "name": "资料缺口非空",
+          "passed": true,
+          "detail": "1 条"
+        },
+        {
+          "name": "无引用",
+          "passed": true,
+          "detail": "实际引用 []"
+        }
+      ],
+      "passed": true,
+      "result": {
+        "status": "tool_error",
+        "answer": "抱歉，知识库检索服务当前不可用（search_docs 连续多次返回 TOOL_UNAVAILABLE），我无法检索到云笺笔记离线模式的相关文档，因此不能确认哪个版本支持离线模式。为避免给出错误信息，本次不作回答，请稍后重试或联系知识库管理员。",
+        "citations": [],
+        "gaps": [
+          "未能获取云笺笔记产品 FAQ / 版本说明文档：search_docs 服务连续 4 次返回 TOOL_UNAVAILABLE，无法定位任何文档，也无法读取原文。"
+        ],
+        "clarification_question": "",
+        "stop_reason": "finished",
+        "steps_used": 5,
+        "tool_calls_used": 5,
+        "limits": {
+          "max_steps": 8,
+          "max_tool_calls": 12
+        },
+        "trace": [
+          {
+            "step": 1,
+            "action": "search_docs",
+            "arguments": {
+              "query": "云笺笔记 离线模式 版本"
+            },
+            "reason": "用户询问云笺笔记离线模式的可用版本，先用产品名和功能关键词检索。",
+            "llm_ms": 1236,
+            "usage": {
+              "prompt_tokens": 1426,
+              "completion_tokens": 153
+            },
+            "ok": false,
+            "observation": "失败 TOOL_UNAVAILABLE：模拟故障（注入）：search_docs 服务暂时不可用",
+            "next_action": "search_docs"
+          },
+          {
+            "step": 1,
+            "action": "search_docs",
+            "arguments": {
+              "query": "离线模式 支持版本 产品 FAQ"
+            },
+            "reason": "同时用通用说法检索，以防产品名未直接命中。",
+            "llm_ms": 1236,
+            "usage": {
+              "prompt_tokens": 1426,
+              "completion_tokens": 153
+            },
+            "ok": false,
+            "observation": "失败 TOOL_UNAVAILABLE：模拟故障（注入）：search_docs 服务暂时不可用",
+            "next_action": "search_docs"
+          },
+          {
+            "step": 2,
+            "action": "search_docs",
+            "arguments": {
+              "query": "云笺笔记 离线模式"
+            },
+            "reason": "上次检索因服务故障失败，重试同一检索以获取文档定位。",
+            "llm_ms": 1437,
+            "usage": {
+              "prompt_tokens": 1695,
+              "completion_tokens": 83
+            },
+            "ok": false,
+            "observation": "失败 TOOL_UNAVAILABLE：模拟故障（注入）：search_docs 服务暂时不可用",
+            "next_action": "search_docs"
+          },
+          {
+            "step": 3,
+            "action": "search_docs",
+            "arguments": {
+              "query": "云笺笔记"
+            },
+            "reason": "再次重试检索，改用更短的关键词以提高命中可能。",
+            "llm_ms": 1487,
+            "usage": {
+              "prompt_tokens": 1838,
+              "completion_tokens": 68
+            },
+            "ok": false,
+            "observation": "失败 TOOL_UNAVAILABLE：模拟故障（注入）：search_docs 服务暂时不可用",
+            "next_action": "search_docs"
+          },
+          {
+            "step": 4,
+            "action": "search_docs",
+            "arguments": {
+              "query": "离线模式"
+            },
+            "reason": "最后一次重试检索，仅用功能关键词，若仍失败则报告工具故障。",
+            "llm_ms": 1237,
+            "usage": {
+              "prompt_tokens": 1966,
+              "completion_tokens": 71
+            },
+            "ok": false,
+            "observation": "失败 TOOL_UNAVAILABLE：模拟故障（注入）：search_docs 服务暂时不可用",
+            "next_action": "finish"
+          },
+          {
+            "step": 5,
+            "action": "finish",
+            "arguments": {
+              "status": "tool_error",
+              "answer": "抱歉，知识库检索服务当前不可用（search_docs 连续多次返回 TOOL_UNAVAILABLE），我无法检索到云笺笔记离线模式的相关文档，因此不能确认哪个版本支持离线模式。为避免给出错误信息，本次不作回答，请稍后重试或联系知识库管理员。",
+              "citations": [],
+              "gaps": [
+                "未能获取云笺笔记产品 FAQ / 版本说明文档：search_docs 服务连续 4 次返回 TOOL_UNAVAILABLE，无法定位任何文档，也无法读取原文。"
+              ]
+            },
+            "reason": "检索工具多次重试均返回服务不可用，无法获得任何文档依据，按规则报告工具故障。",
+            "llm_ms": 2151,
+            "usage": {
+              "prompt_tokens": 2097,
+              "completion_tokens": 250
+            },
+            "ok": true,
+            "observation": "结果通过校验，本轮结束",
+            "next_action": "（结束）"
+          }
+        ],
+        "transcript": [
+          {
+            "role": "system",
+            "content": "你是企业内部知识库问答助手，帮助员工查询公司制度和产品 FAQ。你只能依据工具返回的知识库原文回答，不能使用常识或外部知识补全。\n\n工作方式：每一步调用一个工具，观察结果后决定下一步。可用工具：\n- search_docs：检索知识库。结果为空或与问题无关时，可以换成制度原文里可能出现的说法再检索。\n- read_doc：读取文档原文。引用前必须先读取原文；检索片段只用于定位。\n- finish：提交结构化结果并结束本轮。不要直接用文字回答，必须通过 finish 提交。\n\n决策规则：\n1. 检索后读取相关文档原文，再作答。可能相关的文档都要读，以便发现规定不一致。\n2. 多份文档对同一事项规定不一致时，先在原文中查找适用范围、生效或替代关系等条款：\n   - 原文写明了适用范围或优先级：按原文分别说明，并引用这些条款，status=answered。\n   - 原文没有写明：status=conflict_needs_confirmation。在 answer 中列出每份文档的规定和版本日期，引用各自原文，并在 clarification_question 中请用户确认适用哪份制度。不得因为版本日期较新或其他推测自行选定一个答案。\n3. 检索结果与问题无关时，最多换 2 次关键词；仍然没有依据就 status=insufficient_evidence，在 gaps 中说明缺少什么资料。\n4. 工具返回错误时，你可以选择重试；多次失败后 status=tool_error，说明哪些资料未能获取，不得编造。\n5. 问题缺少必要条件、无法确定要查什么时，status=need_clarification，并在 clarification_question 中追问。\n6. 结合对话历史理解追问（如“那……呢”）。用户在历史中已确认适用哪份制度的，按用户确认的制度回答，并在 answer 中说明依据的是用户确认。\n7. citations 的 quote 必须逐字摘自 read_doc 返回的原文，可以截取片段，但不能改写、拼接或加省略号。answer 中出现的数字必须能在引用原文或用户问题中找到。\n8. 每次调用工具都在 reason 参数中用一句话说明为什么选择这一步。\n9. 本轮最多 8 步，每次工具结果会告诉你剩余步数。快用完时，用已有信息调用 finish。"
+          },
+          {
+            "role": "user",
+            "content": "当前问题：云笺笔记的离线模式哪个版本能用？"
+          },
+          {
+            "role": "assistant",
+            "content": "我会先在知识库中检索云笺笔记离线模式的相关信息。",
+            "tool_calls": [
+              {
+                "id": "call_00_nvalNc3sAAqlzlLgljaW9840",
+                "type": "function",
+                "function": {
+                  "name": "search_docs",
+                  "arguments": "{\"query\": \"云笺笔记 离线模式 版本\", \"reason\": \"用户询问云笺笔记离线模式的可用版本，先用产品名和功能关键词检索。\"}"
+                }
+              },
+              {
+                "id": "call_01_DYx1oRGhbnBQXolPr7sU6193",
+                "type": "function",
+                "function": {
+                  "name": "search_docs",
+                  "arguments": "{\"query\": \"离线模式 支持版本 产品 FAQ\", \"reason\": \"同时用通用说法检索，以防产品名未直接命中。\"}"
+                }
+              }
+            ]
+          },
+          {
+            "role": "tool",
+            "tool_call_id": "call_00_nvalNc3sAAqlzlLgljaW9840",
+            "content": "{\"ok\": false, \"error_code\": \"TOOL_UNAVAILABLE\", \"error\": \"模拟故障（注入）：search_docs 服务暂时不可用\", \"retryable\": true, \"steps_left\": 7}"
+          },
+          {
+            "role": "tool",
+            "tool_call_id": "call_01_DYx1oRGhbnBQXolPr7sU6193",
+            "content": "{\"ok\": false, \"error_code\": \"TOOL_UNAVAILABLE\", \"error\": \"模拟故障（注入）：search_docs 服务暂时不可用\", \"retryable\": true, \"steps_left\": 7}"
+          },
+          {
+            "role": "assistant",
+            "content": "检索服务暂时不可用，我会重试一次。",
+            "tool_calls": [
+              {
+                "id": "call_00_gOYDqmNPWuvD9bA6m12a9801",
+                "type": "function",
+                "function": {
+                  "name": "search_docs",
+                  "arguments": "{\"query\": \"云笺笔记 离线模式\", \"reason\": \"上次检索因服务故障失败，重试同一检索以获取文档定位。\"}"
+                }
+              }
+            ]
+          },
+          {
+            "role": "tool",
+            "tool_call_id": "call_00_gOYDqmNPWuvD9bA6m12a9801",
+            "content": "{\"ok\": false, \"error_code\": \"TOOL_UNAVAILABLE\", \"error\": \"模拟故障（注入）：search_docs 服务暂时不可用\", \"retryable\": true, \"steps_left\": 6}"
+          },
+          {
+            "role": "assistant",
+            "content": "",
+            "tool_calls": [
+              {
+                "id": "call_00_akiG2aETLqytwJT4aT8I6359",
+                "type": "function",
+                "function": {
+                  "name": "search_docs",
+                  "arguments": "{\"query\": \"云笺笔记\", \"reason\": \"再次重试检索，改用更短的关键词以提高命中可能。\"}"
+                }
+              }
+            ]
+          },
+          {
+            "role": "tool",
+            "tool_call_id": "call_00_akiG2aETLqytwJT4aT8I6359",
+            "content": "{\"ok\": false, \"error_code\": \"TOOL_UNAVAILABLE\", \"error\": \"模拟故障（注入）：search_docs 服务暂时不可用\", \"retryable\": true, \"steps_left\": 5}"
+          },
+          {
+            "role": "assistant",
+            "content": "",
+            "tool_calls": [
+              {
+                "id": "call_00_ZhVwiNgjvIePaPkwUVH91581",
+                "type": "function",
+                "function": {
+                  "name": "search_docs",
+                  "arguments": "{\"query\": \"离线模式\", \"reason\": \"最后一次重试检索，仅用功能关键词，若仍失败则报告工具故障。\"}"
+                }
+              }
+            ]
+          },
+          {
+            "role": "tool",
+            "tool_call_id": "call_00_ZhVwiNgjvIePaPkwUVH91581",
+            "content": "{\"ok\": false, \"error_code\": \"TOOL_UNAVAILABLE\", \"error\": \"模拟故障（注入）：search_docs 服务暂时不可用\", \"retryable\": true, \"steps_left\": 4}"
+          },
+          {
+            "role": "assistant",
+            "content": "检索工具连续多次返回服务不可用，我无法获取任何文档，因此无法给出有依据的回答。",
+            "tool_calls": [
+              {
+                "id": "call_00_F5hQtvRzmU097nCw313v0397",
+                "type": "function",
+                "function": {
+                  "name": "finish",
+                  "arguments": "{\"status\": \"tool_error\", \"answer\": \"抱歉，知识库检索服务当前不可用（search_docs 连续多次返回 TOOL_UNAVAILABLE），我无法检索到云笺笔记离线模式的相关文档，因此不能确认哪个版本支持离线模式。为避免给出错误信息，本次不作回答，请稍后重试或联系知识库管理员。\", \"citations\": [], \"gaps\": [\"未能获取云笺笔记产品 FAQ / 版本说明文档：search_docs 服务连续 4 次返回 TOOL_UNAVAILABLE，无法定位任何文档，也无法读取原文。\"], \"reason\": \"检索工具多次重试均返回服务不可用，无法获得任何文档依据，按规则报告工具故障。\"}"
+                }
+              }
+            ]
+          },
+          {
+            "role": "tool",
+            "tool_call_id": "call_00_F5hQtvRzmU097nCw313v0397",
+            "content": "{\"ok\": true, \"accepted\": true, \"steps_left\": 3}"
+          }
+        ],
+        "error": ""
+      }
+    }
+  ]
+}

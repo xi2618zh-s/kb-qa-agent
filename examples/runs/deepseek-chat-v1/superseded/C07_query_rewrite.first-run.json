@@ -1,0 +1,237 @@
+{
+  "case_id": "C07_query_rewrite",
+  "acceptance": [
+    "改写后的相似问题",
+    "检索改进"
+  ],
+  "description": "用户用缩写 WFH，知识库写的是“远程办公”。首次检索无结果时，模型应改写查询再检索。离线 Mock 没有语义改写能力，预期返回资料不足。",
+  "provider": "openai",
+  "model": "deepseek-chat",
+  "options": {},
+  "generated_at": "2026-11-02T17:12:09+08:00",
+  "passed": false,
+  "turns": [
+    {
+      "question": "WFH 要先申请什么？",
+      "history_in": [],
+      "expect": {
+        "status": [
+          "answered"
+        ],
+        "cited_docs_include": [
+          "D05"
+        ],
+        "answer_contains_any": [
+          "VPN"
+        ]
+      },
+      "expect_source": "expect",
+      "checks": [
+        {
+          "name": "status",
+          "passed": false,
+          "detail": "实际 insufficient_evidence，期望 ['answered']"
+        },
+        {
+          "name": "引用包含",
+          "passed": true,
+          "detail": "实际引用 ['D05']"
+        },
+        {
+          "name": "回答包含其一",
+          "passed": true,
+          "detail": "期望含 ['VPN'] 之一，找到 ['VPN']"
+        }
+      ],
+      "passed": false,
+      "result": {
+        "status": "insufficient_evidence",
+        "answer": "知识库中没有找到关于 WFH（居家办公）本身申请流程的制度。唯一相关的规定来自《信息安全与账号规范》（D05，2024-03-10，IT 部）的“远程办公与 VPN”一节：远程办公须通过公司 VPN 接入内网，员工需在 IT 服务台提交 VPN 开通申请，经直属上级审批后 1 个工作日内开通。也就是说，如果 WFH 期间需要访问内网，需先申请 VPN 开通；但 WFH 是否需要事先在 OA 提交居家办公申请、由谁审批，知识库中没有相应制度依据，建议向 HR 或直属上级确认。",
+        "citations": [
+          {
+            "doc_id": "D05",
+            "title": "信息安全与账号规范",
+            "version_date": "2024-03-10",
+            "quote": "远程办公须通过公司 VPN 接入内网。员工在 IT 服务台提交 VPN 开通申请，经直属上级审批后 1 个工作日内开通。"
+          }
+        ],
+        "gaps": [
+          "缺少 WFH（居家办公）本身的申请与审批制度，例如是否需在 OA 提交居家办公申请、审批层级、可申请天数等",
+          "缺少 WFH 期间的考勤与工时记录规定"
+        ],
+        "clarification_question": "",
+        "stop_reason": "finished",
+        "steps_used": 4,
+        "tool_calls_used": 3,
+        "limits": {
+          "max_steps": 8,
+          "max_tool_calls": 12
+        },
+        "trace": [
+          {
+            "step": 1,
+            "action": "search_docs",
+            "arguments": {
+              "query": "WFH 居家办公 申请"
+            },
+            "reason": "用户询问 WFH 需要先申请什么，先检索居家办公申请相关制度。",
+            "llm_ms": 1220,
+            "usage": {
+              "prompt_tokens": 1423,
+              "completion_tokens": 92
+            },
+            "ok": true,
+            "observation": "检索“WFH 居家办公 申请”：5 条 — D05-S2(3.337), D05-S1(1.914), D01-S1(1.762), D04-S1(1.223), D07-S1(1.204)",
+            "next_action": "read_doc"
+          },
+          {
+            "step": 2,
+            "action": "read_doc",
+            "arguments": {
+              "doc_id": "D05"
+            },
+            "reason": "D05-S2 涉及远程办公与 VPN 申请，需读原文确认 WFH 的前置申请要求。",
+            "llm_ms": 1265,
+            "usage": {
+              "prompt_tokens": 2095,
+              "completion_tokens": 110
+            },
+            "ok": true,
+            "observation": "读取 D05《信息安全与账号规范》(2024-03-10)：D05-S1, D05-S2, D05-S3",
+            "next_action": "search_docs"
+          },
+          {
+            "step": 3,
+            "action": "search_docs",
+            "arguments": {
+              "query": "在家办公 远程办公 审批 考勤"
+            },
+            "reason": "D05 只提到 VPN 开通申请，需换关键词查找 WFH 本身的审批或考勤规定。",
+            "llm_ms": 1499,
+            "usage": {
+              "prompt_tokens": 2429,
+              "completion_tokens": 111
+            },
+            "ok": true,
+            "observation": "检索“在家办公 远程办公 审批 考勤”：5 条 — D05-S2(10.859), D05-S3(2.324), D05-S1(1.914), D03-S4(1.822), D01-S1(1.762)",
+            "next_action": "finish"
+          },
+          {
+            "step": 4,
+            "action": "finish",
+            "arguments": {
+              "status": "insufficient_evidence",
+              "answer": "知识库中没有找到关于 WFH（居家办公）本身申请流程的制度。唯一相关的规定来自《信息安全与账号规范》（D05，2024-03-10，IT 部）的“远程办公与 VPN”一节：远程办公须通过公司 VPN 接入内网，员工需在 IT 服务台提交 VPN 开通申请，经直属上级审批后 1 个工作日内开通。也就是说，如果 WFH 期间需要访问内网，需先申请 VPN 开通；但 WFH 是否需要事先在 OA 提交居家办公申请、由谁审批，知识库中没有相应制度依据，建议向 HR 或直属上级确认。",
+              "citations": [
+                {
+                  "doc_id": "D05",
+                  "quote": "远程办公须通过公司 VPN 接入内网。员工在 IT 服务台提交 VPN 开通申请，经直属上级审批后 1 个工作日内开通。"
+                }
+              ],
+              "gaps": [
+                "缺少 WFH（居家办公）本身的申请与审批制度，例如是否需在 OA 提交居家办公申请、审批层级、可申请天数等",
+                "缺少 WFH 期间的考勤与工时记录规定"
+              ]
+            },
+            "reason": "两次检索均只找到 D05 中远程办公需申请 VPN 的条款，知识库无 WFH 申请流程制度，故以 insufficient_evidence 提交并说明缺口。",
+            "llm_ms": 2623,
+            "usage": {
+              "prompt_tokens": 3132,
+              "completion_tokens": 395
+            },
+            "ok": true,
+            "observation": "结果通过校验，本轮结束",
+            "next_action": "（结束）"
+          }
+        ],
+        "transcript": [
+          {
+            "role": "system",
+            "content": "你是企业内部知识库问答助手，帮助员工查询公司制度和产品 FAQ。你只能依据工具返回的知识库原文回答，不能使用常识或外部知识补全。\n\n工作方式：每一步调用一个工具，观察结果后决定下一步。可用工具：\n- search_docs：检索知识库。结果为空或与问题无关时，可以换成制度原文里可能出现的说法再检索。\n- read_doc：读取文档原文。引用前必须先读取原文；检索片段只用于定位。\n- finish：提交结构化结果并结束本轮。不要直接用文字回答，必须通过 finish 提交。\n\n决策规则：\n1. 检索后读取相关文档原文，再作答。可能相关的文档都要读，以便发现规定不一致。\n2. 多份文档对同一事项规定不一致时，先在原文中查找适用范围、生效或替代关系等条款：\n   - 原文写明了适用范围或优先级：按原文分别说明，并引用这些条款，status=answered。\n   - 原文没有写明：status=conflict_needs_confirmation。在 answer 中列出每份文档的规定和版本日期，引用各自原文，并在 clarification_question 中请用户确认适用哪份制度。不得因为版本日期较新或其他推测自行选定一个答案。\n3. 检索结果与问题无关时，最多换 2 次关键词；仍然没有依据就 status=insufficient_evidence，在 gaps 中说明缺少什么资料。\n4. 工具返回错误时，你可以选择重试；多次失败后 status=tool_error，说明哪些资料未能获取，不得编造。\n5. 问题缺少必要条件、无法确定要查什么时，status=need_clarification，并在 clarification_question 中追问。\n6. 结合对话历史理解追问（如“那……呢”）。用户在历史中已确认适用哪份制度的，按用户确认的制度回答，并在 answer 中说明依据的是用户确认。\n7. citations 的 quote 必须逐字摘自 read_doc 返回的原文，可以截取片段，但不能改写、拼接或加省略号。answer 中出现的数字必须能在引用原文或用户问题中找到。\n8. 每次调用工具都在 reason 参数中用一句话说明为什么选择这一步。\n9. 本轮最多 8 步，每次工具结果会告诉你剩余步数。快用完时，用已有信息调用 finish。"
+          },
+          {
+            "role": "user",
+            "content": "当前问题：WFH 要先申请什么？"
+          },
+          {
+            "role": "assistant",
+            "content": "我会先检索知识库中关于 WFH（居家办公）申请流程的规定。",
+            "tool_calls": [
+              {
+                "id": "call_00_7vrf18Qmm7TeCP2Lh1Pn4345",
+                "type": "function",
+                "function": {
+                  "name": "search_docs",
+                  "arguments": "{\"query\": \"WFH 居家办公 申请\", \"reason\": \"用户询问 WFH 需要先申请什么，先检索居家办公申请相关制度。\"}"
+                }
+              }
+            ]
+          },
+          {
+            "role": "tool",
+            "tool_call_id": "call_00_7vrf18Qmm7TeCP2Lh1Pn4345",
+            "content": "{\"ok\": true, \"query\": \"WFH 居家办公 申请\", \"result_count\": 5, \"results\": [{\"doc_id\": \"D05\", \"title\": \"信息安全与账号规范\", \"version_date\": \"2024-03-10\", \"section_id\": \"D05-S2\", \"section_title\": \"远程办公与 VPN\", \"snippet\": \"远程办公须通过公司 VPN 接入内网。员工在 IT 服务台提交 VPN 开通申请，经直属上级审批后 1 个工作日内开通。\", \"score\": 3.337, \"coverage\": 0.192, \"matched_terms\": [\"办公\", \"申请\"]}, {\"doc_id\": \"D05\", \"title\": \"信息安全与账号规范\", \"version_date\": \"2024-03-10\", \"section_id\": \"D05-S1\", \"section_title\": \"密码要求\", \"snippet\": \"办公系统密码长度不少于 12 位，须同时包含大小写字母、数字和符号，每 90 天更换一次。\", \"score\": 1.914, \"coverage\": 0.134, \"matched_terms\": [\"办公\"]}, {\"doc_id\": \"D01\", \"title\": \"费用报销管理办法\", \"version_date\": \"2023-03-01\", \"section_id\": \"D01-S1\", \"section_title\": \"适用范围\", \"snippet\": \"本办法适用于公司全体正式员工因公发生的日常费用报销，包括市内交通费、业务招待费和办公用品费。\", \"score\": 1.762, \"coverage\": 0.134, \"matched_terms\": [\"办公\"]}, {\"doc_id\": \"D04\", \"title\": \"差旅管理办法\", \"version_date\": \"2023-09-01\", \"section_id\": \"D04-S1\", \"section_title\": \"出差申请\", \"snippet\": \"出差前须在 OA 系统提交出差申请，经部门负责人批准后方可预订交通和住宿。\", \"score\": 1.223, \"coverage\": 0.058, \"matched_terms\": [\"申请\"]}, {\"doc_id\": \"D07\", \"title\": \"加班与调休规定\", \"version_date\": \"2023-11-15\", \"section_id\": \"D07-S1\", \"section_title\": \"加班申请\", \"snippet\": \"加班须事先在 OA 系统提交加班申请，经直属上级批准。未经批准的加班不计入调休。\", \"score\": 1.204, \"coverage\": 0.058, \"matched_terms\": [\"申请\"]}], \"steps_left\": 7}"
+          },
+          {
+            "role": "assistant",
+            "content": "检索结果中只有 D05 的远程办公与 VPN 段落相关。我会读取该文档原文，确认是否有 WFH 申请的前置要求。",
+            "tool_calls": [
+              {
+                "id": "call_00_UaFxEeQjfOCR0DOWmDN15229",
+                "type": "function",
+                "function": {
+                  "name": "read_doc",
+                  "arguments": "{\"doc_id\": \"D05\", \"reason\": \"D05-S2 涉及远程办公与 VPN 申请，需读原文确认 WFH 的前置申请要求。\"}"
+                }
+              }
+            ]
+          },
+          {
+            "role": "tool",
+            "tool_call_id": "call_00_UaFxEeQjfOCR0DOWmDN15229",
+            "content": "{\"ok\": true, \"doc_id\": \"D05\", \"title\": \"信息安全与账号规范\", \"version_date\": \"2024-03-10\", \"owner\": \"IT 部\", \"sections\": [{\"section_id\": \"D05-S1\", \"title\": \"密码要求\", \"text\": \"办公系统密码长度不少于 12 位，须同时包含大小写字母、数字和符号，每 90 天更换一次。\"}, {\"section_id\": \"D05-S2\", \"title\": \"远程办公与 VPN\", \"text\": \"远程办公须通过公司 VPN 接入内网。员工在 IT 服务台提交 VPN 开通申请，经直属上级审批后 1 个工作日内开通。\"}, {\"section_id\": \"D05-S3\", \"title\": \"设备丢失\", \"text\": \"公司配发的电脑或手机丢失时，须在 2 小时内报告 IT 服务台，以便远程锁定设备。\"}], \"steps_left\": 6}"
+          },
+          {
+            "role": "assistant",
+            "content": "D05 只规定了远程办公需申请 VPN，未涉及 WFH 本身的审批流程。我会换关键词再检索一次。",
+            "tool_calls": [
+              {
+                "id": "call_00_yUgkkkKuEtMFaCNQLuVZ2071",
+                "type": "function",
+                "function": {
+                  "name": "search_docs",
+                  "arguments": "{\"query\": \"在家办公 远程办公 审批 考勤\", \"reason\": \"D05 只提到 VPN 开通申请，需换关键词查找 WFH 本身的审批或考勤规定。\"}"
+                }
+              }
+            ]
+          },
+          {
+            "role": "tool",
+            "tool_call_id": "call_00_yUgkkkKuEtMFaCNQLuVZ2071",
+            "content": "{\"ok\": true, \"query\": \"在家办公 远程办公 审批 考勤\", \"result_count\": 5, \"results\": [{\"doc_id\": \"D05\", \"title\": \"信息安全与账号规范\", \"version_date\": \"2024-03-10\", \"section_id\": \"D05-S2\", \"section_title\": \"远程办公与 VPN\", \"snippet\": \"远程办公须通过公司 VPN 接入内网。员工在 IT 服务台提交 VPN 开通申请，经直属上级审批后 1 个工作日内开通。\", \"score\": 10.859, \"coverage\": 0.426, \"matched_terms\": [\"办公\", \"远程\", \"程办\", \"审批\"]}, {\"doc_id\": \"D05\", \"title\": \"信息安全与账号规范\", \"version_date\": \"2024-03-10\", \"section_id\": \"D05-S3\", \"section_title\": \"设备丢失\", \"snippet\": \"公司配发的电脑或手机丢失时，须在 2 小时内报告 IT 服务台，以便远程锁定设备。\", \"score\": 2.324, \"coverage\": 0.112, \"matched_terms\": [\"远程\"]}, {\"doc_id\": \"D05\", \"title\": \"信息安全与账号规范\", \"version_date\": \"2024-03-10\", \"section_id\": \"D05-S1\", \"section_title\": \"密码要求\", \"snippet\": \"办公系统密码长度不少于 12 位，须同时包含大小写字母、数字和符号，每 90 天更换一次。\", \"score\": 1.914, \"coverage\": 0.095, \"matched_terms\": [\"办公\"]}, {\"doc_id\": \"D03\", \"title\": \"员工休假制度\", \"version_date\": \"2024-01-01\", \"section_id\": \"D03-S4\", \"section_title\": \"请假流程\", \"snippet\": \"年假须至少提前 3 个工作日在 OA 系统提交申请，经直属上级审批后生效。\", \"score\": 1.822, \"coverage\": 0.083, \"matched_terms\": [\"审批\"]}, {\"doc_id\": \"D01\", \"title\": \"费用报销管理办法\", \"version_date\": \"2023-03-01\", \"section_id\": \"D01-S1\", \"section_title\": \"适用范围\", \"snippet\": \"本办法适用于公司全体正式员工因公发生的日常费用报销，包括市内交通费、业务招待费和办公用品费。\", \"score\": 1.762, \"coverage\": 0.095, \"matched_terms\": [\"办公\"]}], \"steps_left\": 5}"
+          },
+          {
+            "role": "assistant",
+            "content": "知识库中没有 WFH 本身的审批制度，只有远程办公需先申请 VPN 的规定。我会提交结果。",
+            "tool_calls": [
+              {
+                "id": "call_00_Zcm8GIj9tz5bLNAefUiP7862",
+                "type": "function",
+                "function": {
+                  "name": "finish",
+                  "arguments": "{\"status\": \"insufficient_evidence\", \"answer\": \"知识库中没有找到关于 WFH（居家办公）本身申请流程的制度。唯一相关的规定来自《信息安全与账号规范》（D05，2024-03-10，IT 部）的“远程办公与 VPN”一节：远程办公须通过公司 VPN 接入内网，员工需在 IT 服务台提交 VPN 开通申请，经直属上级审批后 1 个工作日内开通。也就是说，如果 WFH 期间需要访问内网，需先申请 VPN 开通；但 WFH 是否需要事先在 OA 提交居家办公申请、由谁审批，知识库中没有相应制度依据，建议向 HR 或直属上级确认。\", \"citations\": [{\"doc_id\": \"D05\", \"quote\": \"远程办公须通过公司 VPN 接入内网。员工在 IT 服务台提交 VPN 开通申请，经直属上级审批后 1 个工作日内开通。\"}], \"gaps\": [\"缺少 WFH（居家办公）本身的申请与审批制度，例如是否需在 OA 提交居家办公申请、审批层级、可申请天数等\", \"缺少 WFH 期间的考勤与工时记录规定\"], \"reason\": \"两次检索均只找到 D05 中远程办公需申请 VPN 的条款，知识库无 WFH 申请流程制度，故以 insufficient_evidence 提交并说明缺口。\"}"
+                }
+              }
+            ]
+          },
+          {
+            "role": "tool",
+            "tool_call_id": "call_00_Zcm8GIj9tz5bLNAefUiP7862",
+            "content": "{\"ok\": true, \"accepted\": true, \"steps_left\": 4}"
+          }
+        ],
+        "error": ""
+      }
+    }
+  ]
+}

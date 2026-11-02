@@ -1,0 +1,833 @@
+[
+  {
+    "case_id": "C08_tool_failure_transient",
+    "acceptance": [
+      "工具失败"
+    ],
+    "description": "检索工具第一次调用失败。代码不自动重试，由模型观察错误后决定重试。",
+    "provider": "openai",
+    "model": "deepseek-chat",
+    "options": {
+      "fail": [
+        "search_docs:once"
+      ]
+    },
+    "generated_at": "2026-11-02T18:36:23+08:00",
+    "passed": true,
+    "turns": [
+      {
+        "question": "云笺笔记的离线模式哪个版本能用？",
+        "history_in": [],
+        "expect": {
+          "status": [
+            "answered"
+          ],
+          "cited_docs_include": [
+            "D06"
+          ],
+          "answer_contains_any": [
+            "专业版"
+          ]
+        },
+        "expect_source": "expect",
+        "checks": [
+          {
+            "name": "status",
+            "passed": true,
+            "detail": "实际 answered，期望 ['answered']"
+          },
+          {
+            "name": "引用包含",
+            "passed": true,
+            "detail": "实际引用 ['D06']"
+          },
+          {
+            "name": "回答包含其一",
+            "passed": true,
+            "detail": "期望含 ['专业版'] 之一，找到 ['专业版']"
+          }
+        ],
+        "passed": true,
+        "result": {
+          "status": "answered",
+          "answer": "云笺笔记的离线模式仅专业版可用，免费版不支持。依据《云笺笔记产品 FAQ》（D06，版本日期 2024-07-01，产品部）\"离线模式\"一节：离线模式仅专业版可用，离线期间的修改会在设备重新联网后自动同步。",
+          "citations": [
+            {
+              "doc_id": "D06",
+              "title": "云笺笔记产品 FAQ",
+              "version_date": "2024-07-01",
+              "quote": "离线模式仅专业版可用。离线期间的修改会在设备重新联网后自动同步。"
+            }
+          ],
+          "gaps": [],
+          "clarification_question": "",
+          "stop_reason": "finished",
+          "steps_used": 5,
+          "tool_calls_used": 3,
+          "limits": {
+            "max_steps": 8,
+            "max_tool_calls": 12
+          },
+          "trace": [
+            {
+              "step": 1,
+              "action": "search_docs",
+              "arguments": {
+                "query": "云笺笔记 离线模式 版本"
+              },
+              "reason": "用户询问云笺笔记离线模式可用的版本，先检索相关产品 FAQ",
+              "llm_ms": 1153,
+              "usage": {
+                "prompt_tokens": 1601,
+                "completion_tokens": 89
+              },
+              "ok": false,
+              "observation": "失败 TOOL_UNAVAILABLE：模拟故障（注入）：search_docs 服务暂时不可用",
+              "next_action": "search_docs"
+            },
+            {
+              "step": 2,
+              "action": "search_docs",
+              "arguments": {
+                "query": "云笺笔记 离线模式 版本"
+              },
+              "reason": "search_docs 返回可重试故障，按规则重试同一检索",
+              "llm_ms": 1188,
+              "usage": {
+                "prompt_tokens": 1750,
+                "completion_tokens": 86
+              },
+              "ok": true,
+              "observation": "检索“云笺笔记 离线模式 版本”：4 条 — D06-S3(18.234), D06-S1(9.238), D06-S2(8.644), D06-S4(5.736)",
+              "next_action": "read_doc"
+            },
+            {
+              "step": 3,
+              "action": "read_doc",
+              "arguments": {
+                "doc_id": "D06"
+              },
+              "reason": "需要读取云笺笔记产品 FAQ 原文，确认离线模式的版本适用规定",
+              "llm_ms": 1048,
+              "usage": {
+                "prompt_tokens": 2352,
+                "completion_tokens": 85
+              },
+              "ok": true,
+              "observation": "读取 D06《云笺笔记产品 FAQ》(2024-07-01)：D06-S1, D06-S2, D06-S3, D06-S4",
+              "next_action": "finish"
+            },
+            {
+              "step": 4,
+              "action": "finish",
+              "arguments": {
+                "status": "answered",
+                "answer": "云笺笔记的离线模式仅专业版可用，免费版不支持。依据《云笺笔记产品 FAQ》（D06，版本日期 2024-07-01，产品部）\"离线模式\"一节：离线模式仅专业版可用，离线期间的修改会在设备重新联网后自动同步。补充：该 FAQ 中专业版价格为每月 30 元或每年 298 元。",
+                "citations": [
+                  {
+                    "doc_id": "D06",
+                    "quote": "离线模式仅专业版可用。离线期间的修改会在设备重新联网后自动同步。"
+                  }
+                ],
+                "gaps": []
+              },
+              "reason": "已读取 D06 原文，其中明确离线模式仅专业版可用，可直接作答",
+              "llm_ms": 1936,
+              "usage": {
+                "prompt_tokens": 2691,
+                "completion_tokens": 233
+              },
+              "ok": false,
+              "observation": "失败 FINISH_REJECTED：answer 中的数字 30, 298 在引用原文和用户问题中找不到；请补充对应引用或删除这些数字",
+              "next_action": "finish"
+            },
+            {
+              "step": 5,
+              "action": "finish",
+              "arguments": {
+                "answer": "云笺笔记的离线模式仅专业版可用，免费版不支持。依据《云笺笔记产品 FAQ》（D06，版本日期 2024-07-01，产品部）\"离线模式\"一节：离线模式仅专业版可用，离线期间的修改会在设备重新联网后自动同步。",
+                "citations": [
+                  {
+                    "doc_id": "D06",
+                    "quote": "离线模式仅专业版可用。离线期间的修改会在设备重新联网后自动同步。"
+                  }
+                ],
+                "gaps": [],
+                "status": "answered"
+              },
+              "reason": "删除未引用的价格数字，仅保留有原文引用支撑的结论",
+              "llm_ms": 1413,
+              "usage": {
+                "prompt_tokens": 3015,
+                "completion_tokens": 209
+              },
+              "ok": true,
+              "observation": "结果通过校验，本轮结束",
+              "next_action": "（结束）"
+            }
+          ],
+          "transcript": [
+            {
+              "role": "system",
+              "content": "你是企业内部知识库问答助手，帮助员工查询公司制度和产品 FAQ。你只能依据工具返回的知识库原文回答，不能使用常识或外部知识补全。\n\n工作方式：每一步调用一个工具，观察结果后决定下一步。可用工具：\n- search_docs：检索知识库。结果为空或与问题无关时，可以换成制度原文里可能出现的说法再检索。\n- read_doc：读取文档原文。引用前必须先读取原文；检索片段只用于定位。\n- finish：提交结构化结果并结束本轮。不要直接用文字回答，必须通过 finish 提交。\n\n决策规则：\n1. 检索后读取相关文档原文，再作答。可能相关的文档都要读，以便发现规定不一致。\n2. 多份文档对同一事项规定不一致时，先在原文中查找适用范围、生效或替代关系等条款：\n   - 原文写明了适用范围或优先级：按原文分别说明，并引用这些条款，status=answered。\n   - 原文没有写明：status=conflict_needs_confirmation。在 answer 中列出每份文档的规定和版本日期，引用各自原文。不得因为版本日期较新或其他推测自行选定一个答案。\n   - 冲突时的 clarification_question 要给出可选项，逐一列出各文档的 ID 和标题，请用户选择适用哪份。只陈述原文中的规定，不得加入原文没有的推测（例如原文没提到的部门、费用类型或流程区分）。\n   - 同一事项按条件分档（如按工龄、城市分级）不是冲突，应按档位说明。\n3. 检索结果与问题无关时，最多换 2 次关键词；仍然完全找不到依据就 status=insufficient_evidence，在 gaps 中说明缺少什么资料，此时不附引用。\n   知识库只能回答问题的一部分时，用 status=answered：回答能回答的部分并引用，把缺失的部分写进 gaps。\n4. 工具返回 TOOL_UNAVAILABLE 时可以重试；同一工具连续 2 次不可用就不要再试，直接 status=tool_error，说明哪些资料未能获取，不得编造。\n5. 问题缺少必要条件、无法确定要查什么时（例如“这个”“那笔”没有可指代的对象），status=need_clarification，并在 clarification_question 中追问。\n6. 结合对话历史理解追问（如“那……呢”）。用户在历史中已确认适用哪份制度的，按用户确认的制度回答，并在 answer 中说明依据的是用户确认。\n7. citations 的 quote 必须逐字摘自 read_doc 返回的原文，可以截取片段，但不能改写、拼接或加省略号。answer 中出现的数字必须能在引用原文或用户问题中找到。\n   citations 只放支撑结论的原文，不为补充信息单独引用。\n8. answer 的格式：第一句直接给出结论；随后说明依据（文档和版本日期）；与问题没有直接关系的补充最多一条。\n9. 每次调用工具都在 reason 参数中用一句话说明为什么选择这一步。\n10. 本轮最多 8 步，每次工具结果会告诉你剩余步数。快用完时，用已有信息调用 finish。"
+            },
+            {
+              "role": "user",
+              "content": "当前问题：云笺笔记的离线模式哪个版本能用？"
+            },
+            {
+              "role": "assistant",
+              "content": "我会先在知识库中检索云笺笔记离线模式的相关信息。",
+              "tool_calls": [
+                {
+                  "id": "call_00_sRcemlVrxbL1JVHLlxCm5961",
+                  "type": "function",
+                  "function": {
+                    "name": "search_docs",
+                    "arguments": "{\"query\": \"云笺笔记 离线模式 版本\", \"reason\": \"用户询问云笺笔记离线模式可用的版本，先检索相关产品 FAQ\"}"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "tool",
+              "tool_call_id": "call_00_sRcemlVrxbL1JVHLlxCm5961",
+              "content": "{\"ok\": false, \"error_code\": \"TOOL_UNAVAILABLE\", \"error\": \"模拟故障（注入）：search_docs 服务暂时不可用\", \"retryable\": true, \"steps_left\": 7}"
+            },
+            {
+              "role": "assistant",
+              "content": "检索工具暂时不可用，我会重试一次。",
+              "tool_calls": [
+                {
+                  "id": "call_00_2bRR5hbNe37xP5lqEHVD4001",
+                  "type": "function",
+                  "function": {
+                    "name": "search_docs",
+                    "arguments": "{\"query\": \"云笺笔记 离线模式 版本\", \"reason\": \"search_docs 返回可重试故障，按规则重试同一检索\"}"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "tool",
+              "tool_call_id": "call_00_2bRR5hbNe37xP5lqEHVD4001",
+              "content": "{\"ok\": true, \"query\": \"云笺笔记 离线模式 版本\", \"result_count\": 4, \"results\": [{\"doc_id\": \"D06\", \"title\": \"云笺笔记产品 FAQ\", \"version_date\": \"2024-07-01\", \"section_id\": \"D06-S3\", \"section_title\": \"离线模式\", \"snippet\": \"离线模式仅专业版可用。离线期间的修改会在设备重新联网后自动同步。\", \"score\": 18.234, \"coverage\": 0.855, \"matched_terms\": [\"云笺\", \"笺笔\", \"笔记\", \"离线\", \"线模\", \"模式\"]}, {\"doc_id\": \"D06\", \"title\": \"云笺笔记产品 FAQ\", \"version_date\": \"2024-07-01\", \"section_id\": \"D06-S1\", \"section_title\": \"版本与存储空间\", \"snippet\": \"云笺笔记免费版提供 5GB 云存储空间；专业版提供 100GB 云存储空间，价格为每月 30 元或每年 298 元。\", \"score\": 9.238, \"coverage\": 0.467, \"matched_terms\": [\"云笺\", \"笺笔\", \"笔记\", \"版本\"]}, {\"doc_id\": \"D06\", \"title\": \"云笺笔记产品 FAQ\", \"version_date\": \"2024-07-01\", \"section_id\": \"D06-S2\", \"section_title\": \"导出格式\", \"snippet\": \"所有版本均支持将笔记导出为 PDF 和 Markdown；专业版额外支持导出 Word 文档。\", \"score\": 8.644, \"coverage\": 0.467, \"matched_terms\": [\"云笺\", \"笺笔\", \"笔记\", \"版本\"]}, {\"doc_id\": \"D06\", \"title\": \"云笺笔记产品 FAQ\", \"version_date\": \"2024-07-01\", \"section_id\": \"D06-S4\", \"section_title\": \"退款\", \"snippet\": \"专业版购买后 7 天内且未使用专业版功能的，可申请全额退款。\", \"score\": 5.736, \"coverage\": 0.322, \"matched_terms\": [\"云笺\", \"笺笔\", \"笔记\"]}], \"steps_left\": 6}"
+            },
+            {
+              "role": "assistant",
+              "content": "检索到 D06 的离线模式段落，我会读取原文确认。",
+              "tool_calls": [
+                {
+                  "id": "call_00_ApAHuscZPiUv0i30uTF80665",
+                  "type": "function",
+                  "function": {
+                    "name": "read_doc",
+                    "arguments": "{\"doc_id\": \"D06\", \"reason\": \"需要读取云笺笔记产品 FAQ 原文，确认离线模式的版本适用规定\"}"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "tool",
+              "tool_call_id": "call_00_ApAHuscZPiUv0i30uTF80665",
+              "content": "{\"ok\": true, \"doc_id\": \"D06\", \"title\": \"云笺笔记产品 FAQ\", \"version_date\": \"2024-07-01\", \"owner\": \"产品部\", \"sections\": [{\"section_id\": \"D06-S1\", \"title\": \"版本与存储空间\", \"text\": \"云笺笔记免费版提供 5GB 云存储空间；专业版提供 100GB 云存储空间，价格为每月 30 元或每年 298 元。\"}, {\"section_id\": \"D06-S2\", \"title\": \"导出格式\", \"text\": \"所有版本均支持将笔记导出为 PDF 和 Markdown；专业版额外支持导出 Word 文档。\"}, {\"section_id\": \"D06-S3\", \"title\": \"离线模式\", \"text\": \"离线模式仅专业版可用。离线期间的修改会在设备重新联网后自动同步。\"}, {\"section_id\": \"D06-S4\", \"title\": \"退款\", \"text\": \"专业版购买后 7 天内且未使用专业版功能的，可申请全额退款。\"}], \"steps_left\": 5}"
+            },
+            {
+              "role": "assistant",
+              "content": "",
+              "tool_calls": [
+                {
+                  "id": "call_00_U6XyK3hIlVinfAjMIuPe5169",
+                  "type": "function",
+                  "function": {
+                    "name": "finish",
+                    "arguments": "{\"status\": \"answered\", \"answer\": \"云笺笔记的离线模式仅专业版可用，免费版不支持。依据《云笺笔记产品 FAQ》（D06，版本日期 2024-07-01，产品部）\\\"离线模式\\\"一节：离线模式仅专业版可用，离线期间的修改会在设备重新联网后自动同步。补充：该 FAQ 中专业版价格为每月 30 元或每年 298 元。\", \"citations\": [{\"doc_id\": \"D06\", \"quote\": \"离线模式仅专业版可用。离线期间的修改会在设备重新联网后自动同步。\"}], \"gaps\": [], \"reason\": \"已读取 D06 原文，其中明确离线模式仅专业版可用，可直接作答\"}"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "tool",
+              "tool_call_id": "call_00_U6XyK3hIlVinfAjMIuPe5169",
+              "content": "{\"ok\": false, \"error_code\": \"FINISH_REJECTED\", \"problems\": [\"answer 中的数字 30, 298 在引用原文和用户问题中找不到；请补充对应引用或删除这些数字\"], \"error\": \"结果未通过校验，请根据 problems 修改后重新调用 finish，或继续检索/读取\", \"steps_left\": 4}"
+            },
+            {
+              "role": "assistant",
+              "content": "",
+              "tool_calls": [
+                {
+                  "id": "call_00_vWdN5FSe94HugM46qwXi4840",
+                  "type": "function",
+                  "function": {
+                    "name": "finish",
+                    "arguments": "{\"answer\": \"云笺笔记的离线模式仅专业版可用，免费版不支持。依据《云笺笔记产品 FAQ》（D06，版本日期 2024-07-01，产品部）\\\"离线模式\\\"一节：离线模式仅专业版可用，离线期间的修改会在设备重新联网后自动同步。\", \"citations\": [{\"doc_id\": \"D06\", \"quote\": \"离线模式仅专业版可用。离线期间的修改会在设备重新联网后自动同步。\"}], \"gaps\": [], \"reason\": \"删除未引用的价格数字，仅保留有原文引用支撑的结论\", \"status\": \"answered\"}"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "tool",
+              "tool_call_id": "call_00_vWdN5FSe94HugM46qwXi4840",
+              "content": "{\"ok\": true, \"accepted\": true, \"steps_left\": 3}"
+            }
+          ],
+          "error": ""
+        }
+      }
+    ]
+  },
+  {
+    "case_id": "C08_tool_failure_transient",
+    "acceptance": [
+      "工具失败"
+    ],
+    "description": "检索工具第一次调用失败。代码不自动重试，由模型观察错误后决定重试。",
+    "provider": "openai",
+    "model": "deepseek-chat",
+    "options": {
+      "fail": [
+        "search_docs:once"
+      ]
+    },
+    "generated_at": "2026-11-02T18:36:30+08:00",
+    "passed": true,
+    "turns": [
+      {
+        "question": "云笺笔记的离线模式哪个版本能用？",
+        "history_in": [],
+        "expect": {
+          "status": [
+            "answered"
+          ],
+          "cited_docs_include": [
+            "D06"
+          ],
+          "answer_contains_any": [
+            "专业版"
+          ]
+        },
+        "expect_source": "expect",
+        "checks": [
+          {
+            "name": "status",
+            "passed": true,
+            "detail": "实际 answered，期望 ['answered']"
+          },
+          {
+            "name": "引用包含",
+            "passed": true,
+            "detail": "实际引用 ['D06']"
+          },
+          {
+            "name": "回答包含其一",
+            "passed": true,
+            "detail": "期望含 ['专业版'] 之一，找到 ['专业版']"
+          }
+        ],
+        "passed": true,
+        "result": {
+          "status": "answered",
+          "answer": "云笺笔记的离线模式仅专业版可用，免费版不支持。依据《云笺笔记产品 FAQ》（D06，版本日期 2024-07-01，产品部）\"离线模式\"一节：离线模式仅专业版可用，离线期间的修改会在设备重新联网后自动同步。",
+          "citations": [
+            {
+              "doc_id": "D06",
+              "title": "云笺笔记产品 FAQ",
+              "version_date": "2024-07-01",
+              "quote": "离线模式仅专业版可用。离线期间的修改会在设备重新联网后自动同步。"
+            }
+          ],
+          "gaps": [],
+          "clarification_question": "",
+          "stop_reason": "finished",
+          "steps_used": 5,
+          "tool_calls_used": 3,
+          "limits": {
+            "max_steps": 8,
+            "max_tool_calls": 12
+          },
+          "trace": [
+            {
+              "step": 1,
+              "action": "search_docs",
+              "arguments": {
+                "query": "云笺笔记 离线模式 版本"
+              },
+              "reason": "用户询问云笺笔记离线模式的可用版本，先检索产品 FAQ 中相关段落",
+              "llm_ms": 1207,
+              "usage": {
+                "prompt_tokens": 1601,
+                "completion_tokens": 91
+              },
+              "ok": false,
+              "observation": "失败 TOOL_UNAVAILABLE：模拟故障（注入）：search_docs 服务暂时不可用",
+              "next_action": "search_docs"
+            },
+            {
+              "step": 2,
+              "action": "search_docs",
+              "arguments": {
+                "query": "云笺笔记 离线模式 版本"
+              },
+              "reason": "上次检索返回 TOOL_UNAVAILABLE 且可重试，再试一次同一查询",
+              "llm_ms": 1059,
+              "usage": {
+                "prompt_tokens": 1752,
+                "completion_tokens": 90
+              },
+              "ok": true,
+              "observation": "检索“云笺笔记 离线模式 版本”：4 条 — D06-S3(18.234), D06-S1(9.238), D06-S2(8.644), D06-S4(5.736)",
+              "next_action": "read_doc"
+            },
+            {
+              "step": 3,
+              "action": "read_doc",
+              "arguments": {
+                "doc_id": "D06"
+              },
+              "reason": "检索片段显示 D06-S3 提到离线模式仅专业版可用，需读取原文核实并查看是否有其他版本说明",
+              "llm_ms": 1503,
+              "usage": {
+                "prompt_tokens": 2358,
+                "completion_tokens": 95
+              },
+              "ok": true,
+              "observation": "读取 D06《云笺笔记产品 FAQ》(2024-07-01)：D06-S1, D06-S2, D06-S3, D06-S4",
+              "next_action": "finish"
+            },
+            {
+              "step": 4,
+              "action": "finish",
+              "arguments": {
+                "status": "answered",
+                "answer": "云笺笔记的离线模式仅专业版可用，免费版不支持。依据《云笺笔记产品 FAQ》（D06，版本日期 2024-07-01，产品部）\"离线模式\"一节：离线模式仅专业版可用，离线期间的修改会在设备重新联网后自动同步。补充：该文档中专业版价格为每月 30 元或每年 298 元。",
+                "citations": [
+                  {
+                    "doc_id": "D06",
+                    "quote": "离线模式仅专业版可用。离线期间的修改会在设备重新联网后自动同步。"
+                  }
+                ],
+                "gaps": []
+              },
+              "reason": "已读取 D06 原文，离线模式条款明确且无其他文档冲突，可直接作答",
+              "llm_ms": 1880,
+              "usage": {
+                "prompt_tokens": 2707,
+                "completion_tokens": 252
+              },
+              "ok": false,
+              "observation": "失败 FINISH_REJECTED：answer 中的数字 30, 298 在引用原文和用户问题中找不到；请补充对应引用或删除这些数字",
+              "next_action": "finish"
+            },
+            {
+              "step": 5,
+              "action": "finish",
+              "arguments": {
+                "answer": "云笺笔记的离线模式仅专业版可用，免费版不支持。依据《云笺笔记产品 FAQ》（D06，版本日期 2024-07-01，产品部）\"离线模式\"一节：离线模式仅专业版可用，离线期间的修改会在设备重新联网后自动同步。",
+                "citations": [
+                  {
+                    "doc_id": "D06",
+                    "quote": "离线模式仅专业版可用。离线期间的修改会在设备重新联网后自动同步。"
+                  }
+                ],
+                "gaps": [],
+                "status": "answered"
+              },
+              "reason": "删除引用中不存在的价格数字后重新提交",
+              "llm_ms": 1419,
+              "usage": {
+                "prompt_tokens": 3050,
+                "completion_tokens": 218
+              },
+              "ok": true,
+              "observation": "结果通过校验，本轮结束",
+              "next_action": "（结束）"
+            }
+          ],
+          "transcript": [
+            {
+              "role": "system",
+              "content": "你是企业内部知识库问答助手，帮助员工查询公司制度和产品 FAQ。你只能依据工具返回的知识库原文回答，不能使用常识或外部知识补全。\n\n工作方式：每一步调用一个工具，观察结果后决定下一步。可用工具：\n- search_docs：检索知识库。结果为空或与问题无关时，可以换成制度原文里可能出现的说法再检索。\n- read_doc：读取文档原文。引用前必须先读取原文；检索片段只用于定位。\n- finish：提交结构化结果并结束本轮。不要直接用文字回答，必须通过 finish 提交。\n\n决策规则：\n1. 检索后读取相关文档原文，再作答。可能相关的文档都要读，以便发现规定不一致。\n2. 多份文档对同一事项规定不一致时，先在原文中查找适用范围、生效或替代关系等条款：\n   - 原文写明了适用范围或优先级：按原文分别说明，并引用这些条款，status=answered。\n   - 原文没有写明：status=conflict_needs_confirmation。在 answer 中列出每份文档的规定和版本日期，引用各自原文。不得因为版本日期较新或其他推测自行选定一个答案。\n   - 冲突时的 clarification_question 要给出可选项，逐一列出各文档的 ID 和标题，请用户选择适用哪份。只陈述原文中的规定，不得加入原文没有的推测（例如原文没提到的部门、费用类型或流程区分）。\n   - 同一事项按条件分档（如按工龄、城市分级）不是冲突，应按档位说明。\n3. 检索结果与问题无关时，最多换 2 次关键词；仍然完全找不到依据就 status=insufficient_evidence，在 gaps 中说明缺少什么资料，此时不附引用。\n   知识库只能回答问题的一部分时，用 status=answered：回答能回答的部分并引用，把缺失的部分写进 gaps。\n4. 工具返回 TOOL_UNAVAILABLE 时可以重试；同一工具连续 2 次不可用就不要再试，直接 status=tool_error，说明哪些资料未能获取，不得编造。\n5. 问题缺少必要条件、无法确定要查什么时（例如“这个”“那笔”没有可指代的对象），status=need_clarification，并在 clarification_question 中追问。\n6. 结合对话历史理解追问（如“那……呢”）。用户在历史中已确认适用哪份制度的，按用户确认的制度回答，并在 answer 中说明依据的是用户确认。\n7. citations 的 quote 必须逐字摘自 read_doc 返回的原文，可以截取片段，但不能改写、拼接或加省略号。answer 中出现的数字必须能在引用原文或用户问题中找到。\n   citations 只放支撑结论的原文，不为补充信息单独引用。\n8. answer 的格式：第一句直接给出结论；随后说明依据（文档和版本日期）；与问题没有直接关系的补充最多一条。\n9. 每次调用工具都在 reason 参数中用一句话说明为什么选择这一步。\n10. 本轮最多 8 步，每次工具结果会告诉你剩余步数。快用完时，用已有信息调用 finish。"
+            },
+            {
+              "role": "user",
+              "content": "当前问题：云笺笔记的离线模式哪个版本能用？"
+            },
+            {
+              "role": "assistant",
+              "content": "我会先在知识库中检索云笺笔记离线模式的相关信息。",
+              "tool_calls": [
+                {
+                  "id": "call_00_j4JDG7MyN0HwM7c8BwB69858",
+                  "type": "function",
+                  "function": {
+                    "name": "search_docs",
+                    "arguments": "{\"query\": \"云笺笔记 离线模式 版本\", \"reason\": \"用户询问云笺笔记离线模式的可用版本，先检索产品 FAQ 中相关段落\"}"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "tool",
+              "tool_call_id": "call_00_j4JDG7MyN0HwM7c8BwB69858",
+              "content": "{\"ok\": false, \"error_code\": \"TOOL_UNAVAILABLE\", \"error\": \"模拟故障（注入）：search_docs 服务暂时不可用\", \"retryable\": true, \"steps_left\": 7}"
+            },
+            {
+              "role": "assistant",
+              "content": "检索工具暂时不可用，我会重试一次。",
+              "tool_calls": [
+                {
+                  "id": "call_00_lJsM0RjmgF2Tpup5BEkK1981",
+                  "type": "function",
+                  "function": {
+                    "name": "search_docs",
+                    "arguments": "{\"query\": \"云笺笔记 离线模式 版本\", \"reason\": \"上次检索返回 TOOL_UNAVAILABLE 且可重试，再试一次同一查询\"}"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "tool",
+              "tool_call_id": "call_00_lJsM0RjmgF2Tpup5BEkK1981",
+              "content": "{\"ok\": true, \"query\": \"云笺笔记 离线模式 版本\", \"result_count\": 4, \"results\": [{\"doc_id\": \"D06\", \"title\": \"云笺笔记产品 FAQ\", \"version_date\": \"2024-07-01\", \"section_id\": \"D06-S3\", \"section_title\": \"离线模式\", \"snippet\": \"离线模式仅专业版可用。离线期间的修改会在设备重新联网后自动同步。\", \"score\": 18.234, \"coverage\": 0.855, \"matched_terms\": [\"云笺\", \"笺笔\", \"笔记\", \"离线\", \"线模\", \"模式\"]}, {\"doc_id\": \"D06\", \"title\": \"云笺笔记产品 FAQ\", \"version_date\": \"2024-07-01\", \"section_id\": \"D06-S1\", \"section_title\": \"版本与存储空间\", \"snippet\": \"云笺笔记免费版提供 5GB 云存储空间；专业版提供 100GB 云存储空间，价格为每月 30 元或每年 298 元。\", \"score\": 9.238, \"coverage\": 0.467, \"matched_terms\": [\"云笺\", \"笺笔\", \"笔记\", \"版本\"]}, {\"doc_id\": \"D06\", \"title\": \"云笺笔记产品 FAQ\", \"version_date\": \"2024-07-01\", \"section_id\": \"D06-S2\", \"section_title\": \"导出格式\", \"snippet\": \"所有版本均支持将笔记导出为 PDF 和 Markdown；专业版额外支持导出 Word 文档。\", \"score\": 8.644, \"coverage\": 0.467, \"matched_terms\": [\"云笺\", \"笺笔\", \"笔记\", \"版本\"]}, {\"doc_id\": \"D06\", \"title\": \"云笺笔记产品 FAQ\", \"version_date\": \"2024-07-01\", \"section_id\": \"D06-S4\", \"section_title\": \"退款\", \"snippet\": \"专业版购买后 7 天内且未使用专业版功能的，可申请全额退款。\", \"score\": 5.736, \"coverage\": 0.322, \"matched_terms\": [\"云笺\", \"笺笔\", \"笔记\"]}], \"steps_left\": 6}"
+            },
+            {
+              "role": "assistant",
+              "content": "检索到 D06 文档，我会读取原文确认离线模式条款。",
+              "tool_calls": [
+                {
+                  "id": "call_00_x1krv3o0rkuhFLRzZp9r1421",
+                  "type": "function",
+                  "function": {
+                    "name": "read_doc",
+                    "arguments": "{\"doc_id\": \"D06\", \"reason\": \"检索片段显示 D06-S3 提到离线模式仅专业版可用，需读取原文核实并查看是否有其他版本说明\"}"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "tool",
+              "tool_call_id": "call_00_x1krv3o0rkuhFLRzZp9r1421",
+              "content": "{\"ok\": true, \"doc_id\": \"D06\", \"title\": \"云笺笔记产品 FAQ\", \"version_date\": \"2024-07-01\", \"owner\": \"产品部\", \"sections\": [{\"section_id\": \"D06-S1\", \"title\": \"版本与存储空间\", \"text\": \"云笺笔记免费版提供 5GB 云存储空间；专业版提供 100GB 云存储空间，价格为每月 30 元或每年 298 元。\"}, {\"section_id\": \"D06-S2\", \"title\": \"导出格式\", \"text\": \"所有版本均支持将笔记导出为 PDF 和 Markdown；专业版额外支持导出 Word 文档。\"}, {\"section_id\": \"D06-S3\", \"title\": \"离线模式\", \"text\": \"离线模式仅专业版可用。离线期间的修改会在设备重新联网后自动同步。\"}, {\"section_id\": \"D06-S4\", \"title\": \"退款\", \"text\": \"专业版购买后 7 天内且未使用专业版功能的，可申请全额退款。\"}], \"steps_left\": 5}"
+            },
+            {
+              "role": "assistant",
+              "content": "知识库中只有这一份文档涉及离线模式，且没有其他冲突规定，可以作答。",
+              "tool_calls": [
+                {
+                  "id": "call_00_D3hX1bx8h0tQ24HKu1kE7680",
+                  "type": "function",
+                  "function": {
+                    "name": "finish",
+                    "arguments": "{\"status\": \"answered\", \"answer\": \"云笺笔记的离线模式仅专业版可用，免费版不支持。依据《云笺笔记产品 FAQ》（D06，版本日期 2024-07-01，产品部）\\\"离线模式\\\"一节：离线模式仅专业版可用，离线期间的修改会在设备重新联网后自动同步。补充：该文档中专业版价格为每月 30 元或每年 298 元。\", \"citations\": [{\"doc_id\": \"D06\", \"quote\": \"离线模式仅专业版可用。离线期间的修改会在设备重新联网后自动同步。\"}], \"gaps\": [], \"reason\": \"已读取 D06 原文，离线模式条款明确且无其他文档冲突，可直接作答\"}"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "tool",
+              "tool_call_id": "call_00_D3hX1bx8h0tQ24HKu1kE7680",
+              "content": "{\"ok\": false, \"error_code\": \"FINISH_REJECTED\", \"problems\": [\"answer 中的数字 30, 298 在引用原文和用户问题中找不到；请补充对应引用或删除这些数字\"], \"error\": \"结果未通过校验，请根据 problems 修改后重新调用 finish，或继续检索/读取\", \"steps_left\": 4}"
+            },
+            {
+              "role": "assistant",
+              "content": "我会删除补充信息中的价格数字，因为引用中没有包含这些数字。",
+              "tool_calls": [
+                {
+                  "id": "call_00_u0zTpCWup4640WukjZcK4413",
+                  "type": "function",
+                  "function": {
+                    "name": "finish",
+                    "arguments": "{\"answer\": \"云笺笔记的离线模式仅专业版可用，免费版不支持。依据《云笺笔记产品 FAQ》（D06，版本日期 2024-07-01，产品部）\\\"离线模式\\\"一节：离线模式仅专业版可用，离线期间的修改会在设备重新联网后自动同步。\", \"citations\": [{\"doc_id\": \"D06\", \"quote\": \"离线模式仅专业版可用。离线期间的修改会在设备重新联网后自动同步。\"}], \"gaps\": [], \"reason\": \"删除引用中不存在的价格数字后重新提交\", \"status\": \"answered\"}"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "tool",
+              "tool_call_id": "call_00_u0zTpCWup4640WukjZcK4413",
+              "content": "{\"ok\": true, \"accepted\": true, \"steps_left\": 3}"
+            }
+          ],
+          "error": ""
+        }
+      }
+    ]
+  },
+  {
+    "case_id": "C08_tool_failure_transient",
+    "acceptance": [
+      "工具失败"
+    ],
+    "description": "检索工具第一次调用失败。代码不自动重试，由模型观察错误后决定重试。",
+    "provider": "openai",
+    "model": "deepseek-chat",
+    "options": {
+      "fail": [
+        "search_docs:once"
+      ]
+    },
+    "generated_at": "2026-11-02T18:36:37+08:00",
+    "passed": true,
+    "turns": [
+      {
+        "question": "云笺笔记的离线模式哪个版本能用？",
+        "history_in": [],
+        "expect": {
+          "status": [
+            "answered"
+          ],
+          "cited_docs_include": [
+            "D06"
+          ],
+          "answer_contains_any": [
+            "专业版"
+          ]
+        },
+        "expect_source": "expect",
+        "checks": [
+          {
+            "name": "status",
+            "passed": true,
+            "detail": "实际 answered，期望 ['answered']"
+          },
+          {
+            "name": "引用包含",
+            "passed": true,
+            "detail": "实际引用 ['D06']"
+          },
+          {
+            "name": "回答包含其一",
+            "passed": true,
+            "detail": "期望含 ['专业版'] 之一，找到 ['专业版']"
+          }
+        ],
+        "passed": true,
+        "result": {
+          "status": "answered",
+          "answer": "云笺笔记的离线模式仅专业版可用，免费版不支持。依据《云笺笔记产品 FAQ》（D06，版本日期 2024-07-01，产品部）的“离线模式”条款：离线模式仅专业版可用，离线期间的修改会在设备重新联网后自动同步。",
+          "citations": [
+            {
+              "doc_id": "D06",
+              "title": "云笺笔记产品 FAQ",
+              "version_date": "2024-07-01",
+              "quote": "离线模式仅专业版可用。离线期间的修改会在设备重新联网后自动同步。"
+            }
+          ],
+          "gaps": [],
+          "clarification_question": "",
+          "stop_reason": "finished",
+          "steps_used": 5,
+          "tool_calls_used": 3,
+          "limits": {
+            "max_steps": 8,
+            "max_tool_calls": 12
+          },
+          "trace": [
+            {
+              "step": 1,
+              "action": "search_docs",
+              "arguments": {
+                "query": "云笺笔记 离线模式 版本"
+              },
+              "reason": "用户询问云笺笔记离线模式可用的版本，先检索相关产品文档",
+              "llm_ms": 1004,
+              "usage": {
+                "prompt_tokens": 1601,
+                "completion_tokens": 89
+              },
+              "ok": false,
+              "observation": "失败 TOOL_UNAVAILABLE：模拟故障（注入）：search_docs 服务暂时不可用",
+              "next_action": "search_docs"
+            },
+            {
+              "step": 2,
+              "action": "search_docs",
+              "arguments": {
+                "query": "云笺笔记 离线模式 版本"
+              },
+              "reason": "search_docs 返回可重试故障，按规则重试同一检索",
+              "llm_ms": 1234,
+              "usage": {
+                "prompt_tokens": 1750,
+                "completion_tokens": 86
+              },
+              "ok": true,
+              "observation": "检索“云笺笔记 离线模式 版本”：4 条 — D06-S3(18.234), D06-S1(9.238), D06-S2(8.644), D06-S4(5.736)",
+              "next_action": "read_doc"
+            },
+            {
+              "step": 3,
+              "action": "read_doc",
+              "arguments": {
+                "doc_id": "D06"
+              },
+              "reason": "检索结果显示 D06-S3 明确提到离线模式仅专业版可用，需读取原文核实并查看是否有其他版本说明",
+              "llm_ms": 1358,
+              "usage": {
+                "prompt_tokens": 2352,
+                "completion_tokens": 95
+              },
+              "ok": true,
+              "observation": "读取 D06《云笺笔记产品 FAQ》(2024-07-01)：D06-S1, D06-S2, D06-S3, D06-S4",
+              "next_action": "finish"
+            },
+            {
+              "step": 4,
+              "action": "finish",
+              "arguments": {
+                "status": "answered",
+                "answer": "云笺笔记的离线模式仅专业版可用，免费版不支持。依据《云笺笔记产品 FAQ》（D06，版本日期 2024-07-01，产品部）的“离线模式”条款：离线模式仅专业版可用，离线期间的修改会在设备重新联网后自动同步。补充：该文档中专业版价格为每月 30 元或每年 298 元。",
+                "citations": [
+                  {
+                    "doc_id": "D06",
+                    "quote": "离线模式仅专业版可用。离线期间的修改会在设备重新联网后自动同步。"
+                  }
+                ],
+                "gaps": []
+              },
+              "reason": "D06 原文明确离线模式仅专业版可用，规定唯一且无冲突，可直接作答",
+              "llm_ms": 1774,
+              "usage": {
+                "prompt_tokens": 2701,
+                "completion_tokens": 255
+              },
+              "ok": false,
+              "observation": "失败 FINISH_REJECTED：answer 中的数字 30, 298 在引用原文和用户问题中找不到；请补充对应引用或删除这些数字",
+              "next_action": "finish"
+            },
+            {
+              "step": 5,
+              "action": "finish",
+              "arguments": {
+                "answer": "云笺笔记的离线模式仅专业版可用，免费版不支持。依据《云笺笔记产品 FAQ》（D06，版本日期 2024-07-01，产品部）的“离线模式”条款：离线模式仅专业版可用，离线期间的修改会在设备重新联网后自动同步。",
+                "citations": [
+                  {
+                    "doc_id": "D06",
+                    "quote": "离线模式仅专业版可用。离线期间的修改会在设备重新联网后自动同步。"
+                  }
+                ],
+                "gaps": [],
+                "status": "answered"
+              },
+              "reason": "删除无引用支撑的价格数字后重新提交，结论与引用均来自 D06 原文",
+              "llm_ms": 1796,
+              "usage": {
+                "prompt_tokens": 3047,
+                "completion_tokens": 230
+              },
+              "ok": true,
+              "observation": "结果通过校验，本轮结束",
+              "next_action": "（结束）"
+            }
+          ],
+          "transcript": [
+            {
+              "role": "system",
+              "content": "你是企业内部知识库问答助手，帮助员工查询公司制度和产品 FAQ。你只能依据工具返回的知识库原文回答，不能使用常识或外部知识补全。\n\n工作方式：每一步调用一个工具，观察结果后决定下一步。可用工具：\n- search_docs：检索知识库。结果为空或与问题无关时，可以换成制度原文里可能出现的说法再检索。\n- read_doc：读取文档原文。引用前必须先读取原文；检索片段只用于定位。\n- finish：提交结构化结果并结束本轮。不要直接用文字回答，必须通过 finish 提交。\n\n决策规则：\n1. 检索后读取相关文档原文，再作答。可能相关的文档都要读，以便发现规定不一致。\n2. 多份文档对同一事项规定不一致时，先在原文中查找适用范围、生效或替代关系等条款：\n   - 原文写明了适用范围或优先级：按原文分别说明，并引用这些条款，status=answered。\n   - 原文没有写明：status=conflict_needs_confirmation。在 answer 中列出每份文档的规定和版本日期，引用各自原文。不得因为版本日期较新或其他推测自行选定一个答案。\n   - 冲突时的 clarification_question 要给出可选项，逐一列出各文档的 ID 和标题，请用户选择适用哪份。只陈述原文中的规定，不得加入原文没有的推测（例如原文没提到的部门、费用类型或流程区分）。\n   - 同一事项按条件分档（如按工龄、城市分级）不是冲突，应按档位说明。\n3. 检索结果与问题无关时，最多换 2 次关键词；仍然完全找不到依据就 status=insufficient_evidence，在 gaps 中说明缺少什么资料，此时不附引用。\n   知识库只能回答问题的一部分时，用 status=answered：回答能回答的部分并引用，把缺失的部分写进 gaps。\n4. 工具返回 TOOL_UNAVAILABLE 时可以重试；同一工具连续 2 次不可用就不要再试，直接 status=tool_error，说明哪些资料未能获取，不得编造。\n5. 问题缺少必要条件、无法确定要查什么时（例如“这个”“那笔”没有可指代的对象），status=need_clarification，并在 clarification_question 中追问。\n6. 结合对话历史理解追问（如“那……呢”）。用户在历史中已确认适用哪份制度的，按用户确认的制度回答，并在 answer 中说明依据的是用户确认。\n7. citations 的 quote 必须逐字摘自 read_doc 返回的原文，可以截取片段，但不能改写、拼接或加省略号。answer 中出现的数字必须能在引用原文或用户问题中找到。\n   citations 只放支撑结论的原文，不为补充信息单独引用。\n8. answer 的格式：第一句直接给出结论；随后说明依据（文档和版本日期）；与问题没有直接关系的补充最多一条。\n9. 每次调用工具都在 reason 参数中用一句话说明为什么选择这一步。\n10. 本轮最多 8 步，每次工具结果会告诉你剩余步数。快用完时，用已有信息调用 finish。"
+            },
+            {
+              "role": "user",
+              "content": "当前问题：云笺笔记的离线模式哪个版本能用？"
+            },
+            {
+              "role": "assistant",
+              "content": "我会先在知识库中检索云笺笔记离线模式的相关信息。",
+              "tool_calls": [
+                {
+                  "id": "call_00_iZsyUxEm0PpeZ8m8o7pM5243",
+                  "type": "function",
+                  "function": {
+                    "name": "search_docs",
+                    "arguments": "{\"query\": \"云笺笔记 离线模式 版本\", \"reason\": \"用户询问云笺笔记离线模式可用的版本，先检索相关产品文档\"}"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "tool",
+              "tool_call_id": "call_00_iZsyUxEm0PpeZ8m8o7pM5243",
+              "content": "{\"ok\": false, \"error_code\": \"TOOL_UNAVAILABLE\", \"error\": \"模拟故障（注入）：search_docs 服务暂时不可用\", \"retryable\": true, \"steps_left\": 7}"
+            },
+            {
+              "role": "assistant",
+              "content": "检索工具暂时不可用，我会重试一次。",
+              "tool_calls": [
+                {
+                  "id": "call_00_yqARDliOK2G00X9VOwNX5912",
+                  "type": "function",
+                  "function": {
+                    "name": "search_docs",
+                    "arguments": "{\"query\": \"云笺笔记 离线模式 版本\", \"reason\": \"search_docs 返回可重试故障，按规则重试同一检索\"}"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "tool",
+              "tool_call_id": "call_00_yqARDliOK2G00X9VOwNX5912",
+              "content": "{\"ok\": true, \"query\": \"云笺笔记 离线模式 版本\", \"result_count\": 4, \"results\": [{\"doc_id\": \"D06\", \"title\": \"云笺笔记产品 FAQ\", \"version_date\": \"2024-07-01\", \"section_id\": \"D06-S3\", \"section_title\": \"离线模式\", \"snippet\": \"离线模式仅专业版可用。离线期间的修改会在设备重新联网后自动同步。\", \"score\": 18.234, \"coverage\": 0.855, \"matched_terms\": [\"云笺\", \"笺笔\", \"笔记\", \"离线\", \"线模\", \"模式\"]}, {\"doc_id\": \"D06\", \"title\": \"云笺笔记产品 FAQ\", \"version_date\": \"2024-07-01\", \"section_id\": \"D06-S1\", \"section_title\": \"版本与存储空间\", \"snippet\": \"云笺笔记免费版提供 5GB 云存储空间；专业版提供 100GB 云存储空间，价格为每月 30 元或每年 298 元。\", \"score\": 9.238, \"coverage\": 0.467, \"matched_terms\": [\"云笺\", \"笺笔\", \"笔记\", \"版本\"]}, {\"doc_id\": \"D06\", \"title\": \"云笺笔记产品 FAQ\", \"version_date\": \"2024-07-01\", \"section_id\": \"D06-S2\", \"section_title\": \"导出格式\", \"snippet\": \"所有版本均支持将笔记导出为 PDF 和 Markdown；专业版额外支持导出 Word 文档。\", \"score\": 8.644, \"coverage\": 0.467, \"matched_terms\": [\"云笺\", \"笺笔\", \"笔记\", \"版本\"]}, {\"doc_id\": \"D06\", \"title\": \"云笺笔记产品 FAQ\", \"version_date\": \"2024-07-01\", \"section_id\": \"D06-S4\", \"section_title\": \"退款\", \"snippet\": \"专业版购买后 7 天内且未使用专业版功能的，可申请全额退款。\", \"score\": 5.736, \"coverage\": 0.322, \"matched_terms\": [\"云笺\", \"笺笔\", \"笔记\"]}], \"steps_left\": 6}"
+            },
+            {
+              "role": "assistant",
+              "content": "检索到 D06 文档，我会读取原文确认离线模式条款。",
+              "tool_calls": [
+                {
+                  "id": "call_00_WdGqCElungLLKpcCfM7n2751",
+                  "type": "function",
+                  "function": {
+                    "name": "read_doc",
+                    "arguments": "{\"doc_id\": \"D06\", \"reason\": \"检索结果显示 D06-S3 明确提到离线模式仅专业版可用，需读取原文核实并查看是否有其他版本说明\"}"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "tool",
+              "tool_call_id": "call_00_WdGqCElungLLKpcCfM7n2751",
+              "content": "{\"ok\": true, \"doc_id\": \"D06\", \"title\": \"云笺笔记产品 FAQ\", \"version_date\": \"2024-07-01\", \"owner\": \"产品部\", \"sections\": [{\"section_id\": \"D06-S1\", \"title\": \"版本与存储空间\", \"text\": \"云笺笔记免费版提供 5GB 云存储空间；专业版提供 100GB 云存储空间，价格为每月 30 元或每年 298 元。\"}, {\"section_id\": \"D06-S2\", \"title\": \"导出格式\", \"text\": \"所有版本均支持将笔记导出为 PDF 和 Markdown；专业版额外支持导出 Word 文档。\"}, {\"section_id\": \"D06-S3\", \"title\": \"离线模式\", \"text\": \"离线模式仅专业版可用。离线期间的修改会在设备重新联网后自动同步。\"}, {\"section_id\": \"D06-S4\", \"title\": \"退款\", \"text\": \"专业版购买后 7 天内且未使用专业版功能的，可申请全额退款。\"}], \"steps_left\": 5}"
+            },
+            {
+              "role": "assistant",
+              "content": "知识库中只有 D06 一份文档涉及该问题，且规定明确，无需进一步检索。",
+              "tool_calls": [
+                {
+                  "id": "call_00_SSxt9Y6NMeLvrFYYhUsJ1740",
+                  "type": "function",
+                  "function": {
+                    "name": "finish",
+                    "arguments": "{\"status\": \"answered\", \"answer\": \"云笺笔记的离线模式仅专业版可用，免费版不支持。依据《云笺笔记产品 FAQ》（D06，版本日期 2024-07-01，产品部）的“离线模式”条款：离线模式仅专业版可用，离线期间的修改会在设备重新联网后自动同步。补充：该文档中专业版价格为每月 30 元或每年 298 元。\", \"citations\": [{\"doc_id\": \"D06\", \"quote\": \"离线模式仅专业版可用。离线期间的修改会在设备重新联网后自动同步。\"}], \"gaps\": [], \"reason\": \"D06 原文明确离线模式仅专业版可用，规定唯一且无冲突，可直接作答\"}"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "tool",
+              "tool_call_id": "call_00_SSxt9Y6NMeLvrFYYhUsJ1740",
+              "content": "{\"ok\": false, \"error_code\": \"FINISH_REJECTED\", \"problems\": [\"answer 中的数字 30, 298 在引用原文和用户问题中找不到；请补充对应引用或删除这些数字\"], \"error\": \"结果未通过校验，请根据 problems 修改后重新调用 finish，或继续检索/读取\", \"steps_left\": 4}"
+            },
+            {
+              "role": "assistant",
+              "content": "我会删除补充信息中的价格数字，因为该内容与问题无直接关系。",
+              "tool_calls": [
+                {
+                  "id": "call_00_oK7igbXCC5yASZiT1MYj8396",
+                  "type": "function",
+                  "function": {
+                    "name": "finish",
+                    "arguments": "{\"answer\": \"云笺笔记的离线模式仅专业版可用，免费版不支持。依据《云笺笔记产品 FAQ》（D06，版本日期 2024-07-01，产品部）的“离线模式”条款：离线模式仅专业版可用，离线期间的修改会在设备重新联网后自动同步。\", \"citations\": [{\"doc_id\": \"D06\", \"quote\": \"离线模式仅专业版可用。离线期间的修改会在设备重新联网后自动同步。\"}], \"gaps\": [], \"reason\": \"删除无引用支撑的价格数字后重新提交，结论与引用均来自 D06 原文\", \"status\": \"answered\"}"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "tool",
+              "tool_call_id": "call_00_oK7igbXCC5yASZiT1MYj8396",
+              "content": "{\"ok\": true, \"accepted\": true, \"steps_left\": 3}"
+            }
+          ],
+          "error": ""
+        }
+      }
+    ]
+  }
+]
